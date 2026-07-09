@@ -29,7 +29,7 @@ type FormData = {
   would_recommend: boolean | null
   teacher_absence: 'nunca' | 'raramente' | 'frequente' | null
   teacher_is_engaging: boolean | null
-  is_easy_to_pass: 'sim' | 'mais_ou_menos' | 'nao' | null
+  is_easy_to_pass: boolean | null
   // Sobre a disciplina (step 3)
   attendance_pressure: 'baixa' | 'media' | 'alta' | null
   assessment_styles: AssessmentStyleBase[]
@@ -509,16 +509,8 @@ export default function AvaliarPage() {
           <div className="space-y-5 pt-2 border-t border-edge-muted">
             <p className="text-xs font-semibold text-fg-subtle uppercase tracking-wider pt-2">Sobre a disciplina</p>
 
-            <ToggleGroup
-              label="É fácil de passar?"
-              value={form.is_easy_to_pass}
-              options={[
-                { value: 'sim', label: 'Fácil', emoji: '😌' },
-                { value: 'mais_ou_menos', label: 'Mais ou menos', emoji: '😅' },
-                { value: 'nao', label: 'Difícil', emoji: '😬' },
-              ]}
-              onChange={(v) => set({ is_easy_to_pass: form.is_easy_to_pass === v ? null : v as 'sim' | 'mais_ou_menos' | 'nao' })}
-            />
+            <BoolPicker label="É fácil de passar?" value={form.is_easy_to_pass}
+              onChange={(v) => set({ is_easy_to_pass: v })} options={['Fácil', 'Difícil']} />
 
             <ToggleGroup
               label="Pressão por presença"

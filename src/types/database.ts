@@ -98,7 +98,7 @@ type ReviewRow = {
   relevant_to_course: boolean | null
   // Novos campos v2
   teacher_absence: 'nunca' | 'raramente' | 'frequente' | null
-  is_easy_to_pass: 'sim' | 'mais_ou_menos' | 'nao' | null
+  is_easy_to_pass: boolean | null
   teacher_is_engaging: boolean | null
   exam_types: string[] | null
   has_assignments: boolean | null
