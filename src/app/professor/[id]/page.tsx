@@ -59,27 +59,27 @@ export default async function TeacherPage({ params }: Props) {
     <div className="container-page py-10">
       <div className="mb-10">
         <div className="flex items-center gap-2 mb-6">
-          <Link href="/" className="text-sm text-slate-400 hover:text-brand-600 transition-colors">
+          <Link href="/" className="text-sm text-[#6e7681] hover:text-[#3fb950] transition-colors">
             Início
           </Link>
-          <span className="text-slate-300">/</span>
-          <span className="text-sm text-slate-600">{teacher.name}</span>
+          <span className="text-[#30363d]">/</span>
+          <span className="text-sm text-[#8b949e]">{teacher.name}</span>
         </div>
 
         <div className="flex items-start gap-5">
           <Avatar name={teacher.name} size="lg" />
           <div>
-            <h1 className="text-4xl font-bold text-slate-900 mb-1">{teacher.name}</h1>
-            <p className="text-slate-400 text-sm mb-2">
+            <h1 className="text-4xl font-bold text-[#e6edf3] mb-1">{teacher.name}</h1>
+            <p className="text-[#6e7681] text-sm mb-2">
               {reviews.length} {reviews.length === 1 ? 'avaliação' : 'avaliações'} de alunos
             </p>
             {reviews.length > 0 && (
               <div className="flex items-center gap-2">
                 <StarRating value={avgOf(reviews, 'rating_general')} />
-                <span className="font-bold text-slate-900">
+                <span className="font-bold text-[#e6edf3]">
                   {avgOf(reviews, 'rating_general').toFixed(1)}
                 </span>
-                <span className="text-slate-400 text-sm">nota geral</span>
+                <span className="text-[#6e7681] text-sm">nota geral</span>
               </div>
             )}
           </div>
@@ -90,31 +90,31 @@ export default async function TeacherPage({ params }: Props) {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-10">
           {stats.map((m) => (
             <Card key={m.label} className="text-center py-4 px-3">
-              <div className="text-2xl font-bold text-slate-900 tabular-nums">
+              <div className="text-2xl font-bold text-[#e6edf3] tabular-nums">
                 {m.value.toFixed(1)}
               </div>
-              <div className="text-xs text-slate-400 mt-1">{m.label}</div>
+              <div className="text-xs text-[#6e7681] mt-1">{m.label}</div>
             </Card>
           ))}
           <Card className="text-center py-4 px-3">
-            <div className="text-2xl font-bold text-emerald-600 tabular-nums">
+            <div className="text-2xl font-bold text-[#3fb950] tabular-nums">
               {pctRecommend}%
             </div>
-            <div className="text-xs text-slate-400 mt-1">Recomenda</div>
+            <div className="text-xs text-[#6e7681] mt-1">Recomenda</div>
           </Card>
         </div>
       )}
 
       {subjects.length > 0 && (
         <div className="mb-10">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">Disciplinas lecionadas</h2>
+          <h2 className="text-xl font-bold text-[#e6edf3] mb-4">Disciplinas lecionadas</h2>
           <div className="flex flex-wrap gap-2">
             {subjects.map((s: SubjectBasic) => (
               <Link key={s.id} href={`/disciplina/${s.id}`}>
-                <span className="inline-flex items-center gap-1.5 bg-brand-50 text-brand-700 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-brand-100 transition-colors cursor-pointer">
+                <span className="inline-flex items-center gap-1.5 bg-brand-100 text-brand-400 text-sm font-medium px-3 py-1.5 rounded-full hover:bg-brand-200 transition-colors cursor-pointer border border-brand-300">
                   {s.name}
                   {s.modality === 'ead' && (
-                    <span className="text-xs text-brand-400">· EAD</span>
+                    <span className="text-xs text-brand-300">· EAD</span>
                   )}
                 </span>
               </Link>
@@ -125,17 +125,17 @@ export default async function TeacherPage({ params }: Props) {
 
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-slate-900">
+          <h2 className="text-xl font-bold text-[#e6edf3]">
             Avaliações
             {reviews.length > 0 && (
-              <span className="ml-2 text-base font-normal text-slate-400">
+              <span className="ml-2 text-base font-normal text-[#6e7681]">
                 ({reviews.length})
               </span>
             )}
           </h2>
           <Link
             href="/avaliar"
-            className="text-sm font-semibold bg-brand-600 text-white px-4 py-2 rounded-xl hover:bg-brand-700 transition-colors"
+            className="text-sm font-semibold bg-brand-600 text-white px-4 py-2 rounded-xl hover:bg-brand-500 transition-colors"
           >
             + Avaliar
           </Link>
@@ -144,12 +144,12 @@ export default async function TeacherPage({ params }: Props) {
         {reviews.length === 0 ? (
           <Card className="text-center py-16">
             <div className="text-4xl mb-4">📝</div>
-            <p className="text-slate-500 font-medium mb-2">
+            <p className="text-[#8b949e] font-medium mb-2">
               Nenhuma avaliação ainda para {teacher.name}.
             </p>
             <Link
               href="/avaliar"
-              className="inline-flex items-center gap-2 bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-brand-700 transition-colors mt-4"
+              className="inline-flex items-center gap-2 bg-brand-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-brand-500 transition-colors mt-4"
             >
               Ser o primeiro a avaliar →
             </Link>
@@ -163,14 +163,14 @@ export default async function TeacherPage({ params }: Props) {
                     {review.subject && (
                       <Link
                         href={`/disciplina/${review.subject.id}`}
-                        className="text-sm font-semibold text-brand-600 hover:underline"
+                        className="text-sm font-semibold text-[#58a6ff] hover:underline"
                       >
                         {review.subject.name}
                       </Link>
                     )}
                     <div className="flex items-center gap-2 mt-1">
                       <StarRating value={review.rating_general} size="sm" />
-                      <span className="text-sm font-bold text-slate-800">
+                      <span className="text-sm font-bold text-[#e6edf3]">
                         {review.rating_general}/5
                       </span>
                     </div>
@@ -194,20 +194,20 @@ export default async function TeacherPage({ params }: Props) {
                     { label: 'Carga', value: review.rating_workload },
                     { label: 'Dificuldade', value: review.rating_difficulty },
                   ].map((m) => (
-                    <div key={m.label} className="bg-slate-50 rounded-xl py-2.5 text-center">
-                      <div className="text-base font-bold text-slate-900">{m.value}</div>
-                      <div className="text-xs text-slate-400 mt-0.5">{m.label}</div>
+                    <div key={m.label} className="bg-[#21262d] rounded-xl py-2.5 text-center">
+                      <div className="text-base font-bold text-[#e6edf3]">{m.value}</div>
+                      <div className="text-xs text-[#6e7681] mt-0.5">{m.label}</div>
                     </div>
                   ))}
                 </div>
 
                 {review.comment && (
-                  <p className="text-sm text-slate-600 leading-relaxed border-t border-slate-50 pt-3">
+                  <p className="text-sm text-[#8b949e] leading-relaxed border-t border-[#21262d] pt-3">
                     &ldquo;{review.comment}&rdquo;
                   </p>
                 )}
 
-                <p className="text-xs text-slate-300 mt-3">
+                <p className="text-xs text-[#6e7681] mt-3">
                   {new Date(review.created_at).toLocaleDateString('pt-BR', {
                     month: 'long',
                     year: 'numeric',

@@ -27,9 +27,14 @@ export async function getSubjectsByTeacher(teacherId: string): Promise<SubjectBa
     .eq('teacher_id', teacherId)
     .eq('active', true)
   if (!data) return []
+  const seen = new Set<string>()
   return (data as Array<{ subject: SubjectBasic | null }>)
     .map((ts) => ts.subject)
-    .filter((s): s is SubjectBasic => s !== null)
+    .filter((s): s is SubjectBasic => {
+      if (!s || seen.has(s.id)) return false
+      seen.add(s.id)
+      return true
+    })
 }
 
 export type ReviewByTeacher = {

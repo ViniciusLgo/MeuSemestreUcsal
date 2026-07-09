@@ -1,4 +1,10 @@
 -- =====================
+-- LIMPA DADOS ANTERIORES (safe para re-executar)
+-- =====================
+
+TRUNCATE courses, subjects, teachers CASCADE;
+
+-- =====================
 -- CURSOS
 -- =====================
 
@@ -8,43 +14,85 @@ INSERT INTO courses (id, code, name) VALUES
 ON CONFLICT (code) DO NOTHING;
 
 -- =====================
--- MATRIZES
+-- MATRIZES (Matutino + Noturno para BES e ADS)
 -- =====================
+
+-- BES Matutino  id: 0001-0001
+-- BES Noturno   id: 0001-0002
+-- ADS Matutino  id: 0002-0001
+-- ADS Noturno   id: 0002-0002
 
 INSERT INTO curriculum_versions (id, course_id, name, campus, shift, year) VALUES
   ('00000000-0000-0001-0001-000000000001',
    '00000000-0000-0000-0000-000000000001',
-   'Matriz 2023/1', 'Pituaçu', 'Matutino', 2023),
+   'Matriz 2023/1 — Matutino', 'Pituaçu', 'Matutino', 2023),
   ('00000000-0000-0001-0001-000000000002',
+   '00000000-0000-0000-0000-000000000001',
+   'Matriz 2023/1 — Noturno', 'Pituaçu', 'Noturno', 2023),
+  ('00000000-0000-0002-0001-000000000001',
    '00000000-0000-0000-0000-000000000002',
-   'Matriz 2023/1', 'Pituaçu', 'Noturno', 2023)
+   'Matriz 2023/1 — Matutino', 'Pituaçu', 'Matutino', 2023),
+  ('00000000-0000-0002-0001-000000000002',
+   '00000000-0000-0000-0000-000000000002',
+   'Matriz 2023/1 — Noturno', 'Pituaçu', 'Noturno', 2023)
 ON CONFLICT DO NOTHING;
 
 -- =====================
--- SEMESTRES BES (1-8)
+-- SEMESTRES BES MATUTINO (1-8)
+-- prefixo 00000001-0001 = curso 1 (BES), versão 0001 (matutino)
 -- =====================
 
 INSERT INTO semesters (id, curriculum_version_id, number) VALUES
-  ('10000000-0000-0000-0000-000000000001', '00000000-0000-0001-0001-000000000001', 1),
-  ('10000000-0000-0000-0000-000000000002', '00000000-0000-0001-0001-000000000001', 2),
-  ('10000000-0000-0000-0000-000000000003', '00000000-0000-0001-0001-000000000001', 3),
-  ('10000000-0000-0000-0000-000000000004', '00000000-0000-0001-0001-000000000001', 4),
-  ('10000000-0000-0000-0000-000000000005', '00000000-0000-0001-0001-000000000001', 5),
-  ('10000000-0000-0000-0000-000000000006', '00000000-0000-0001-0001-000000000001', 6),
-  ('10000000-0000-0000-0000-000000000007', '00000000-0000-0001-0001-000000000001', 7),
-  ('10000000-0000-0000-0000-000000000008', '00000000-0000-0001-0001-000000000001', 8)
+  ('00000001-0001-0000-0000-000000000001', '00000000-0000-0001-0001-000000000001', 1),
+  ('00000001-0001-0000-0000-000000000002', '00000000-0000-0001-0001-000000000001', 2),
+  ('00000001-0001-0000-0000-000000000003', '00000000-0000-0001-0001-000000000001', 3),
+  ('00000001-0001-0000-0000-000000000004', '00000000-0000-0001-0001-000000000001', 4),
+  ('00000001-0001-0000-0000-000000000005', '00000000-0000-0001-0001-000000000001', 5),
+  ('00000001-0001-0000-0000-000000000006', '00000000-0000-0001-0001-000000000001', 6),
+  ('00000001-0001-0000-0000-000000000007', '00000000-0000-0001-0001-000000000001', 7),
+  ('00000001-0001-0000-0000-000000000008', '00000000-0000-0001-0001-000000000001', 8)
 ON CONFLICT DO NOTHING;
 
 -- =====================
--- SEMESTRES ADS (1-5)
+-- SEMESTRES BES NOTURNO (1-8)
+-- prefixo 00000001-0002 = curso 1 (BES), versão 0002 (noturno)
 -- =====================
 
 INSERT INTO semesters (id, curriculum_version_id, number) VALUES
-  ('20000000-0000-0000-0000-000000000001', '00000000-0000-0001-0001-000000000002', 1),
-  ('20000000-0000-0000-0000-000000000002', '00000000-0000-0001-0001-000000000002', 2),
-  ('20000000-0000-0000-0000-000000000003', '00000000-0000-0001-0001-000000000002', 3),
-  ('20000000-0000-0000-0000-000000000004', '00000000-0000-0001-0001-000000000002', 4),
-  ('20000000-0000-0000-0000-000000000005', '00000000-0000-0001-0001-000000000002', 5)
+  ('00000001-0002-0000-0000-000000000001', '00000000-0000-0001-0001-000000000002', 1),
+  ('00000001-0002-0000-0000-000000000002', '00000000-0000-0001-0001-000000000002', 2),
+  ('00000001-0002-0000-0000-000000000003', '00000000-0000-0001-0001-000000000002', 3),
+  ('00000001-0002-0000-0000-000000000004', '00000000-0000-0001-0001-000000000002', 4),
+  ('00000001-0002-0000-0000-000000000005', '00000000-0000-0001-0001-000000000002', 5),
+  ('00000001-0002-0000-0000-000000000006', '00000000-0000-0001-0001-000000000002', 6),
+  ('00000001-0002-0000-0000-000000000007', '00000000-0000-0001-0001-000000000002', 7),
+  ('00000001-0002-0000-0000-000000000008', '00000000-0000-0001-0001-000000000002', 8)
+ON CONFLICT DO NOTHING;
+
+-- =====================
+-- SEMESTRES ADS MATUTINO (1-5)
+-- prefixo 00000002-0001 = curso 2 (ADS), versão 0001 (matutino)
+-- =====================
+
+INSERT INTO semesters (id, curriculum_version_id, number) VALUES
+  ('00000002-0001-0000-0000-000000000001', '00000000-0000-0002-0001-000000000001', 1),
+  ('00000002-0001-0000-0000-000000000002', '00000000-0000-0002-0001-000000000001', 2),
+  ('00000002-0001-0000-0000-000000000003', '00000000-0000-0002-0001-000000000001', 3),
+  ('00000002-0001-0000-0000-000000000004', '00000000-0000-0002-0001-000000000001', 4),
+  ('00000002-0001-0000-0000-000000000005', '00000000-0000-0002-0001-000000000001', 5)
+ON CONFLICT DO NOTHING;
+
+-- =====================
+-- SEMESTRES ADS NOTURNO (1-5)
+-- prefixo 00000002-0002 = curso 2 (ADS), versão 0002 (noturno)
+-- =====================
+
+INSERT INTO semesters (id, curriculum_version_id, number) VALUES
+  ('00000002-0002-0000-0000-000000000001', '00000000-0000-0002-0001-000000000002', 1),
+  ('00000002-0002-0000-0000-000000000002', '00000000-0000-0002-0001-000000000002', 2),
+  ('00000002-0002-0000-0000-000000000003', '00000000-0000-0002-0001-000000000002', 3),
+  ('00000002-0002-0000-0000-000000000004', '00000000-0000-0002-0001-000000000002', 4),
+  ('00000002-0002-0000-0000-000000000005', '00000000-0000-0002-0001-000000000002', 5)
 ON CONFLICT DO NOTHING;
 
 -- =====================
@@ -154,112 +202,165 @@ INSERT INTO subjects (code, name, type, modality) VALUES
 ON CONFLICT (code) DO NOTHING;
 
 -- =====================
--- VÍNCULOS BES — SEMESTRE 1
+-- HELPER: macro para vincular disciplinas a uma versão+semestre
+-- Usamos um bloco DO para reutilizar lógica nos 4 turnos
 -- =====================
-INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
-SELECT '00000000-0000-0001-0001-000000000001', '10000000-0000-0000-0000-000000000001', s.id,
-  row_number() OVER (ORDER BY s.code), TRUE
-FROM subjects s WHERE s.code IN ('BES001','BES004','BES005','BES046','EFB499','EFG011')
-ON CONFLICT DO NOTHING;
 
--- SEMESTRE 2
-INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
-SELECT '00000000-0000-0001-0001-000000000001', '10000000-0000-0000-0000-000000000002', s.id,
-  row_number() OVER (ORDER BY s.code), TRUE
-FROM subjects s WHERE s.code IN ('BES008','BES010','BES016','BES048','EFG017')
-ON CONFLICT DO NOTHING;
+DO $$
+DECLARE
+  -- IDs das 4 versões
+  bes_mat UUID := '00000000-0000-0001-0001-000000000001';
+  bes_not UUID := '00000000-0000-0001-0001-000000000002';
+  ads_mat UUID := '00000000-0000-0002-0001-000000000001';
+  ads_not UUID := '00000000-0000-0002-0001-000000000002';
 
--- SEMESTRE 3
-INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
-SELECT '00000000-0000-0001-0001-000000000001', '10000000-0000-0000-0000-000000000003', s.id,
-  row_number() OVER (ORDER BY s.code), TRUE
-FROM subjects s WHERE s.code IN ('BES006','BES011','BES012','BES049','EFG201')
-ON CONFLICT DO NOTHING;
+  -- Semestres BES matutino (00000001-0001)
+  bm1 UUID := '00000001-0001-0000-0000-000000000001';
+  bm2 UUID := '00000001-0001-0000-0000-000000000002';
+  bm3 UUID := '00000001-0001-0000-0000-000000000003';
+  bm4 UUID := '00000001-0001-0000-0000-000000000004';
+  bm5 UUID := '00000001-0001-0000-0000-000000000005';
+  bm6 UUID := '00000001-0001-0000-0000-000000000006';
+  bm7 UUID := '00000001-0001-0000-0000-000000000007';
+  bm8 UUID := '00000001-0001-0000-0000-000000000008';
 
--- SEMESTRE 4
-INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
-SELECT '00000000-0000-0001-0001-000000000001', '10000000-0000-0000-0000-000000000004', s.id,
-  row_number() OVER (ORDER BY s.code), TRUE
-FROM subjects s WHERE s.code IN ('BES009','BES020','BES021','BES022','BES050','EFG013')
-ON CONFLICT DO NOTHING;
+  -- Semestres BES noturno (00000001-0002)
+  bn1 UUID := '00000001-0002-0000-0000-000000000001';
+  bn2 UUID := '00000001-0002-0000-0000-000000000002';
+  bn3 UUID := '00000001-0002-0000-0000-000000000003';
+  bn4 UUID := '00000001-0002-0000-0000-000000000004';
+  bn5 UUID := '00000001-0002-0000-0000-000000000005';
+  bn6 UUID := '00000001-0002-0000-0000-000000000006';
+  bn7 UUID := '00000001-0002-0000-0000-000000000007';
+  bn8 UUID := '00000001-0002-0000-0000-000000000008';
 
--- SEMESTRE 5
-INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
-SELECT '00000000-0000-0001-0001-000000000001', '10000000-0000-0000-0000-000000000005', s.id,
-  row_number() OVER (ORDER BY s.code), TRUE
-FROM subjects s WHERE s.code IN ('BES019','BES023','BES026','BES051','EFG018')
-ON CONFLICT DO NOTHING;
+  -- Semestres ADS matutino (00000002-0001)
+  am1 UUID := '00000002-0001-0000-0000-000000000001';
+  am2 UUID := '00000002-0001-0000-0000-000000000002';
+  am3 UUID := '00000002-0001-0000-0000-000000000003';
+  am4 UUID := '00000002-0001-0000-0000-000000000004';
+  am5 UUID := '00000002-0001-0000-0000-000000000005';
 
--- SEMESTRE 6
-INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
-SELECT '00000000-0000-0001-0001-000000000001', '10000000-0000-0000-0000-000000000006', s.id,
-  row_number() OVER (ORDER BY s.code), TRUE
-FROM subjects s WHERE s.code IN ('BES024','BES027','BES035','BES036','BES038','EFB659')
-ON CONFLICT DO NOTHING;
+  -- Semestres ADS noturno (00000002-0002)
+  an1 UUID := '00000002-0002-0000-0000-000000000001';
+  an2 UUID := '00000002-0002-0000-0000-000000000002';
+  an3 UUID := '00000002-0002-0000-0000-000000000003';
+  an4 UUID := '00000002-0002-0000-0000-000000000004';
+  an5 UUID := '00000002-0002-0000-0000-000000000005';
 
--- SEMESTRE 7
-INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
-SELECT '00000000-0000-0001-0001-000000000001', '10000000-0000-0000-0000-000000000007', s.id,
-  row_number() OVER (ORDER BY s.code), TRUE
-FROM subjects s WHERE s.code IN ('BES034','BES037','BES043','BES045')
-ON CONFLICT DO NOTHING;
+  cur_v UUID;
+  sem_ids UUID[];
+BEGIN
 
--- SEMESTRE 8
-INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
-SELECT '00000000-0000-0001-0001-000000000001', '10000000-0000-0000-0000-000000000008', s.id,
-  row_number() OVER (ORDER BY s.code), TRUE
-FROM subjects s WHERE s.code IN ('BES039','BES040','BES044','BES052','BES053')
-ON CONFLICT DO NOTHING;
+  -- BES matutino e noturno têm a mesma grade, só muda o turno
+  FOREACH cur_v IN ARRAY ARRAY[bes_mat, bes_not]::uuid[] LOOP
+    IF cur_v = bes_mat THEN
+      sem_ids := ARRAY[bm1,bm2,bm3,bm4,bm5,bm6,bm7,bm8];
+    ELSE
+      sem_ids := ARRAY[bn1,bn2,bn3,bn4,bn5,bn6,bn7,bn8];
+    END IF;
 
--- =====================
--- VÍNCULOS ADS — SEMESTRE 1
--- =====================
-INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
-SELECT '00000000-0000-0001-0001-000000000002', '20000000-0000-0000-0000-000000000001', s.id,
-  row_number() OVER (ORDER BY s.code), TRUE
-FROM subjects s WHERE s.code IN ('CST302','CST303','CST304','CST328','CST367','EFG011')
-ON CONFLICT DO NOTHING;
+    -- Sem 1
+    INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
+    SELECT cur_v, sem_ids[1], s.id, row_number() OVER (ORDER BY s.code), TRUE
+    FROM subjects s WHERE s.code IN ('BES001','BES004','BES005','BES046','EFB499','EFG011')
+    ON CONFLICT DO NOTHING;
 
--- SEMESTRE 2
-INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
-SELECT '00000000-0000-0001-0001-000000000002', '20000000-0000-0000-0000-000000000002', s.id,
-  row_number() OVER (ORDER BY s.code), TRUE
-FROM subjects s WHERE s.code IN ('CST222','CST309','CST310','CST319','EFG017','EFG201')
-ON CONFLICT DO NOTHING;
+    -- Sem 2
+    INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
+    SELECT cur_v, sem_ids[2], s.id, row_number() OVER (ORDER BY s.code), TRUE
+    FROM subjects s WHERE s.code IN ('BES008','BES010','BES016','BES048','EFG017')
+    ON CONFLICT DO NOTHING;
 
--- SEMESTRE 3
-INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
-SELECT '00000000-0000-0001-0001-000000000002', '20000000-0000-0000-0000-000000000003', s.id,
-  row_number() OVER (ORDER BY s.code), TRUE
-FROM subjects s WHERE s.code IN ('CST305','CST311','CST313','CST315','EFG013')
-ON CONFLICT DO NOTHING;
+    -- Sem 3
+    INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
+    SELECT cur_v, sem_ids[3], s.id, row_number() OVER (ORDER BY s.code), TRUE
+    FROM subjects s WHERE s.code IN ('BES006','BES011','BES012','BES049','EFG201')
+    ON CONFLICT DO NOTHING;
 
--- SEMESTRE 4
-INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
-SELECT '00000000-0000-0001-0001-000000000002', '20000000-0000-0000-0000-000000000004', s.id,
-  row_number() OVER (ORDER BY s.code), TRUE
-FROM subjects s WHERE s.code IN ('CST223','CST314','CST316','CST318','CST320','EFG018')
-ON CONFLICT DO NOTHING;
+    -- Sem 4
+    INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
+    SELECT cur_v, sem_ids[4], s.id, row_number() OVER (ORDER BY s.code), TRUE
+    FROM subjects s WHERE s.code IN ('BES009','BES020','BES021','BES022','BES050','EFG013')
+    ON CONFLICT DO NOTHING;
 
--- SEMESTRE 5
-INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
-SELECT '00000000-0000-0001-0001-000000000002', '20000000-0000-0000-0000-000000000005', s.id,
-  row_number() OVER (ORDER BY s.code), TRUE
-FROM subjects s WHERE s.code IN ('CST224','CST322','CST324','CST325','CST327','EFB659')
-ON CONFLICT DO NOTHING;
+    -- Sem 5
+    INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
+    SELECT cur_v, sem_ids[5], s.id, row_number() OVER (ORDER BY s.code), TRUE
+    FROM subjects s WHERE s.code IN ('BES019','BES023','BES026','BES051','EFG018')
+    ON CONFLICT DO NOTHING;
 
--- =====================
--- ELETIVAS — disponíveis para BES e ADS
--- =====================
-INSERT INTO curriculum_subjects (curriculum_version_id, subject_id, is_required)
-SELECT '00000000-0000-0001-0001-000000000001', s.id, FALSE
-FROM subjects s WHERE s.type = 'elective'
-ON CONFLICT DO NOTHING;
+    -- Sem 6
+    INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
+    SELECT cur_v, sem_ids[6], s.id, row_number() OVER (ORDER BY s.code), TRUE
+    FROM subjects s WHERE s.code IN ('BES024','BES027','BES035','BES036','BES038','EFB659')
+    ON CONFLICT DO NOTHING;
 
-INSERT INTO curriculum_subjects (curriculum_version_id, subject_id, is_required)
-SELECT '00000000-0000-0001-0001-000000000002', s.id, FALSE
-FROM subjects s WHERE s.type = 'elective'
-ON CONFLICT DO NOTHING;
+    -- Sem 7
+    INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
+    SELECT cur_v, sem_ids[7], s.id, row_number() OVER (ORDER BY s.code), TRUE
+    FROM subjects s WHERE s.code IN ('BES034','BES037','BES043','BES045')
+    ON CONFLICT DO NOTHING;
+
+    -- Sem 8
+    INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
+    SELECT cur_v, sem_ids[8], s.id, row_number() OVER (ORDER BY s.code), TRUE
+    FROM subjects s WHERE s.code IN ('BES039','BES040','BES044','BES052','BES053')
+    ON CONFLICT DO NOTHING;
+
+    -- Eletivas
+    INSERT INTO curriculum_subjects (curriculum_version_id, subject_id, is_required)
+    SELECT cur_v, s.id, FALSE FROM subjects s WHERE s.type = 'elective'
+    ON CONFLICT DO NOTHING;
+
+  END LOOP;
+
+  -- ADS matutino e noturno
+  FOREACH cur_v IN ARRAY ARRAY[ads_mat, ads_not]::uuid[] LOOP
+    IF cur_v = ads_mat THEN
+      sem_ids := ARRAY[am1,am2,am3,am4,am5];
+    ELSE
+      sem_ids := ARRAY[an1,an2,an3,an4,an5];
+    END IF;
+
+    -- Sem 1
+    INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
+    SELECT cur_v, sem_ids[1], s.id, row_number() OVER (ORDER BY s.code), TRUE
+    FROM subjects s WHERE s.code IN ('CST302','CST303','CST304','CST328','CST367','EFG011')
+    ON CONFLICT DO NOTHING;
+
+    -- Sem 2
+    INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
+    SELECT cur_v, sem_ids[2], s.id, row_number() OVER (ORDER BY s.code), TRUE
+    FROM subjects s WHERE s.code IN ('CST222','CST309','CST310','CST319','EFG017','EFG201')
+    ON CONFLICT DO NOTHING;
+
+    -- Sem 3
+    INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
+    SELECT cur_v, sem_ids[3], s.id, row_number() OVER (ORDER BY s.code), TRUE
+    FROM subjects s WHERE s.code IN ('CST305','CST311','CST313','CST315','EFG013')
+    ON CONFLICT DO NOTHING;
+
+    -- Sem 4
+    INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
+    SELECT cur_v, sem_ids[4], s.id, row_number() OVER (ORDER BY s.code), TRUE
+    FROM subjects s WHERE s.code IN ('CST223','CST314','CST316','CST318','CST320','EFG018')
+    ON CONFLICT DO NOTHING;
+
+    -- Sem 5
+    INSERT INTO curriculum_subjects (curriculum_version_id, semester_id, subject_id, recommended_order, is_required)
+    SELECT cur_v, sem_ids[5], s.id, row_number() OVER (ORDER BY s.code), TRUE
+    FROM subjects s WHERE s.code IN ('CST224','CST322','CST324','CST325','CST327','EFB659')
+    ON CONFLICT DO NOTHING;
+
+    -- Eletivas
+    INSERT INTO curriculum_subjects (curriculum_version_id, subject_id, is_required)
+    SELECT cur_v, s.id, FALSE FROM subjects s WHERE s.type = 'elective'
+    ON CONFLICT DO NOTHING;
+
+  END LOOP;
+
+END $$;
 
 -- =====================
 -- ADMIN SEED

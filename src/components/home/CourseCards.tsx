@@ -13,7 +13,7 @@ const courses = [
     description:
       'Formação completa em desenvolvimento, arquitetura, qualidade e gestão de software.',
     variant: 'info' as const,
-    gradient: 'from-brand-500 to-brand-700',
+    gradient: 'from-[#238636] to-[#196127]',
   },
   {
     code: 'ADS',
@@ -25,7 +25,7 @@ const courses = [
     description:
       'Curso tecnólogo focado no desenvolvimento ágil de sistemas e aplicações corporativas.',
     variant: 'default' as const,
-    gradient: 'from-purple-500 to-purple-700',
+    gradient: 'from-[#6e40c9] to-[#4a2d8a]',
   },
 ]
 
@@ -33,8 +33,8 @@ export function CourseCards() {
   return (
     <section className="container-page py-16">
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold text-slate-900 mb-3">Escolha seu curso</h2>
-        <p className="text-slate-500 max-w-lg mx-auto">
+        <h2 className="text-3xl font-bold text-[#e6edf3] mb-3">Escolha seu curso</h2>
+        <p className="text-[#8b949e] max-w-lg mx-auto">
           Selecione o curso para explorar a matriz curricular, comparar professores e ler avaliações.
         </p>
       </div>
@@ -53,12 +53,12 @@ export function CourseCards() {
                 {course.type}
               </Badge>
 
-              <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-600 transition-colors">
+              <h3 className="text-xl font-bold text-[#e6edf3] mb-2 group-hover:text-[#3fb950] transition-colors">
                 {course.name}
               </h3>
-              <p className="text-sm text-slate-500 mb-5 leading-relaxed">{course.description}</p>
+              <p className="text-sm text-[#8b949e] mb-5 leading-relaxed">{course.description}</p>
 
-              <div className="flex items-center gap-4 text-xs text-slate-400 font-medium pt-4 border-t border-slate-50">
+              <div className="flex items-center gap-4 text-xs text-[#6e7681] font-medium pt-4 border-t border-[#21262d]">
                 <span>{course.semesters} semestres</span>
                 <span>{course.shift}</span>
                 <span>{course.subjects} disciplinas</span>

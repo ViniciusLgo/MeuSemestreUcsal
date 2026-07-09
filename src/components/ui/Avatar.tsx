@@ -13,12 +13,12 @@ const sizes = {
 }
 
 const colorPalette = [
-  'bg-brand-100 text-brand-700',
-  'bg-emerald-100 text-emerald-700',
-  'bg-amber-100 text-amber-700',
-  'bg-rose-100 text-rose-700',
-  'bg-purple-100 text-purple-700',
-  'bg-cyan-100 text-cyan-700',
+  'bg-brand-200 text-brand-400',
+  'bg-[#143d23] text-[#3fb950]',
+  'bg-[#2d1f00] text-amber-400',
+  'bg-[#2d0a0a] text-red-400',
+  'bg-[#1a0533] text-purple-400',
+  'bg-[#051d4d] text-[#58a6ff]',
 ]
 
 function pickColor(name: string) {

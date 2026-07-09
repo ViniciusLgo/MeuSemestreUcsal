@@ -1,58 +1,83 @@
 import Link from 'next/link'
+import { getProfile } from '@/lib/queries/profiles'
+import { SignOutButton } from './SignOutButton'
+import { Logo } from '@/components/ui/Logo'
 
-export function Header() {
+export async function Header() {
+  const profile = await getProfile()
+
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-slate-100">
+    <header className="sticky top-0 z-50 bg-[#161b22]/95 backdrop-blur-sm border-b border-[#30363d]">
       <div className="container-page flex items-center justify-between h-16">
         <Link href="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-xl bg-brand-600 flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-bold text-xs tracking-tight">MS</span>
-          </div>
-          <span className="font-semibold text-slate-900 text-[15px] group-hover:text-brand-600 transition-colors">
-            MeuSemestre<span className="text-brand-600">UCSAL</span>
+          <Logo size="sm" />
+          <span className="font-semibold text-[#e6edf3] text-[15px] group-hover:text-[#3fb950] transition-colors">
+            MeuSemestre<span className="text-[#3fb950]">UCSAL</span>
           </span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
           <Link
             href="/curso/BES"
-            className="px-3 py-2 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+            className="px-3 py-2 text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d] rounded-lg transition-colors"
           >
             Eng. de Software
           </Link>
           <Link
             href="/curso/ADS"
-            className="px-3 py-2 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+            className="px-3 py-2 text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d] rounded-lg transition-colors"
           >
             ADS
           </Link>
           <Link
             href="/buscar"
-            className="px-3 py-2 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
+            className="px-3 py-2 text-[#8b949e] hover:text-[#e6edf3] hover:bg-[#21262d] rounded-lg transition-colors"
           >
             Buscar
-          </Link>
-          <Link
-            href="/monte-sua-grade"
-            className="px-3 py-2 text-slate-600 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
-          >
-            Grade Perfeita
           </Link>
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link
-            href="/entrar"
-            className="text-sm font-medium text-slate-600 hover:text-brand-600 transition-colors px-3 py-2"
-          >
-            Entrar
-          </Link>
-          <Link
-            href="/avaliar"
-            className="text-sm font-semibold bg-brand-600 text-white px-4 py-2 rounded-xl hover:bg-brand-700 transition-colors"
-          >
-            Avaliar professor
-          </Link>
+          {profile ? (
+            <>
+              {profile.role === 'admin' && (
+                <Link
+                  href="/painel-interno"
+                  className="text-sm font-medium text-[#8b949e] hover:text-[#e6edf3] transition-colors px-3 py-2"
+                >
+                  Painel
+                </Link>
+              )}
+              <Link
+                href="/perfil"
+                className="text-sm font-medium text-[#8b949e] hover:text-[#e6edf3] transition-colors px-3 py-2"
+              >
+                Meu perfil
+              </Link>
+              <SignOutButton />
+              <Link
+                href="/avaliar"
+                className="text-sm font-semibold bg-brand-600 text-white px-4 py-2 rounded-xl hover:bg-brand-500 transition-colors"
+              >
+                Avaliar professor
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/entrar"
+                className="text-sm font-medium text-[#8b949e] hover:text-[#e6edf3] transition-colors px-3 py-2"
+              >
+                Entrar
+              </Link>
+              <Link
+                href="/entrar?redirectTo=/avaliar"
+                className="text-sm font-semibold bg-brand-600 text-white px-4 py-2 rounded-xl hover:bg-brand-500 transition-colors"
+              >
+                Avaliar professor
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
