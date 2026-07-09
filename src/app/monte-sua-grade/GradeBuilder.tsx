@@ -34,7 +34,7 @@ type ColorMap = Record<string, number>
 type SlotConfig = {
   days: string[]    // ['SEG', 'QUA']
   slotId: number    // 0-4
-  numSlots: number  // quantos slots consecutivos (1 ou 2)
+  numSlots: number  // quantos slots consecutivos (1–4)
 }
 type SlotConfigs = Record<string, SlotConfig> // subject_id → config
 
@@ -531,6 +531,8 @@ export function GradeBuilder() {
                                   {[
                                     { v: 1, label: '1 aula (50 min)' },
                                     { v: 2, label: '2 aulas (100 min)' },
+                                    { v: 3, label: '3 aulas (150 min)' },
+                                    { v: 4, label: '4 aulas (200 min)' },
                                   ].map(({ v, label }) => {
                                     const active = (config?.numSlots ?? 1) === v
                                     return (
