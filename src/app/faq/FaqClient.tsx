@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 
-type FaqItem = { q: string; a: string }
+type FaqItem = { q: string; a: string | React.ReactNode }
 
 const PLATAFORMA: FaqItem[] = [
   {
@@ -45,7 +45,64 @@ const PLATAFORMA: FaqItem[] = [
   },
 ]
 
+const REMATRICULA_2026_2 = (
+  <div className="space-y-4">
+    <p className="text-xs font-semibold text-fg-subtle uppercase tracking-wide">Rematrícula 2026.2 — Etapa Financeira</p>
+    <p>Neste semestre você antecipa a matrícula financeira e garante desconto especial no boleto. Fique atento aos prazos abaixo.</p>
+
+    <div className="rounded-xl border border-edge overflow-hidden text-xs">
+      {/* Etapa Financeira */}
+      <div className="bg-surface-2 px-3 py-2 font-semibold text-fg border-b border-edge">Etapa Financeira</div>
+      {[
+        { periodo: '1º Período — 02/06 a 08/06/2026', detalhe: 'Desconto de 15% + prioridade na escolha de disciplinas', color: 'text-brand-400' },
+        { periodo: '2º Período — 09/06 a 18/06/2026', detalhe: 'Desconto de 10%', color: 'text-accent-400' },
+        { periodo: '3º Período — a partir de 19/06/2026', detalhe: 'Sem descontos', color: 'text-fg-subtle' },
+      ].map((row) => (
+        <div key={row.periodo} className="flex gap-3 px-3 py-2.5 border-b border-edge-muted last:border-0">
+          <span className={`font-semibold flex-shrink-0 ${row.color}`}>{row.periodo}</span>
+          <span className="text-fg-muted">{row.detalhe}</span>
+        </div>
+      ))}
+
+      {/* Etapa Acadêmica */}
+      <div className="bg-surface-2 px-3 py-2 font-semibold text-fg border-t border-b border-edge">Etapa Acadêmica (escolha de disciplinas)</div>
+      {[
+        { cond: 'Pagamento com 15% de desconto', periodo: '30/06 a 02/07/2026', color: 'text-brand-400' },
+        { cond: 'Pagamento com 10% de desconto', periodo: '03/07 a 07/07/2026', color: 'text-accent-400' },
+        { cond: 'Ainda não realizou o pagamento', periodo: 'A partir de 08/07/2026', color: 'text-fg-subtle' },
+      ].map((row) => (
+        <div key={row.cond} className="flex gap-3 px-3 py-2.5 border-b border-edge-muted last:border-0">
+          <span className={`font-semibold flex-shrink-0 ${row.color}`}>{row.periodo}</span>
+          <span className="text-fg-muted">{row.cond}</span>
+        </div>
+      ))}
+
+      {/* Etapa de Ajustes */}
+      <div className="bg-surface-2 px-3 py-2 font-semibold text-fg border-t border-b border-edge">Etapa de Ajustes</div>
+      {[
+        { periodo: '1º Ajuste — 13/07 a 15/07/2026', detalhe: 'Fechado e exclusivo', color: 'text-fg-muted' },
+        { periodo: '2º Ajuste — 16/07 a 23/07/2026', detalhe: 'Abertura de outras disciplinas (via requerimento no portal)', color: 'text-fg-muted' },
+        { periodo: '3º Ajuste — 24/07 a 07/08/2026', detalhe: 'Somente inclusão', color: 'text-fg-muted' },
+      ].map((row) => (
+        <div key={row.periodo} className="flex gap-3 px-3 py-2.5 border-b border-edge-muted last:border-0">
+          <span className={`font-semibold flex-shrink-0 ${row.color}`}>{row.periodo}</span>
+          <span className="text-fg-muted">{row.detalhe}</span>
+        </div>
+      ))}
+    </div>
+
+    <div className="flex items-center gap-2 bg-brand-100 border border-brand-300 rounded-xl px-4 py-3">
+      <span className="text-lg">🎓</span>
+      <p className="text-brand-400 font-semibold text-sm">Início das Aulas: 10/08/2026</p>
+    </div>
+  </div>
+)
+
 const UCSAL: FaqItem[] = [
+  {
+    q: 'Quais são os prazos da rematrícula 2026.2?',
+    a: REMATRICULA_2026_2,
+  },
   {
     q: 'Como acesso o portal do aluno?',
     a: 'O portal do aluno da UCSAL fica em portal.ucsal.br. Use seu RA (registro acadêmico) e a senha cadastrada no ato da matrícula. Em caso de esquecimento de senha, acione a secretaria acadêmica presencialmente ou pelo e-mail da unidade.',

@@ -1,5 +1,7 @@
 'use client'
 
+import { Fragment } from 'react'
+
 // ─── Horários reais da UCSAL (blocos de 75 min) ───────────────────────────────
 
 export const MANHA_SLOTS = [
@@ -98,10 +100,10 @@ export function ScheduleGrid({ scheduleMap, onRemove, compact = false }: Props) 
         </thead>
         <tbody>
           {periodsToRender.map((period) => (
-            <>
+            <Fragment key={period.label}>
               {/* Header de período */}
               {!compact && (
-                <tr key={`h-${period.label}`}>
+                <tr>
                   <td colSpan={7}
                     className="text-[9px] font-bold text-fg-subtle uppercase tracking-widest py-1.5 pt-3 text-left pr-2">
                     {period.label}
@@ -141,7 +143,7 @@ export function ScheduleGrid({ scheduleMap, onRemove, compact = false }: Props) 
                   })}
                 </tr>
               ))}
-            </>
+            </Fragment>
           ))}
         </tbody>
       </table>

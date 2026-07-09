@@ -77,9 +77,13 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-edge-muted flex flex-col sm:flex-row justify-between gap-2 text-xs text-fg-subtle">
-          <p>© {new Date().getFullYear()} MeuSemestreUCSAL — Projeto independente de alunos.</p>
-          <p>Não afiliado oficialmente à UCSAL.</p>
+        <div className="mt-10 pt-6 border-t border-edge-muted flex flex-col sm:flex-row justify-between gap-4 text-xs text-fg-subtle">
+          <p>© {new Date().getFullYear()} MeuSemestreUCSAL — Projeto independente de alunos. Não afiliado oficialmente à UCSAL.</p>
+          <div className="flex gap-4 flex-shrink-0">
+            <Link href="/privacidade" className="hover:text-fg-muted transition-colors">Privacidade & LGPD</Link>
+            <Link href="/atualizacoes" className="hover:text-fg-muted transition-colors">Atualizações</Link>
+            <Link href="/termos" className="hover:text-fg-muted transition-colors">Termos de uso</Link>
+          </div>
         </div>
       </div>
     </footer>

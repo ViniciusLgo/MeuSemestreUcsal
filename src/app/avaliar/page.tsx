@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
+import { submitReview } from '@/lib/actions/student'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -65,21 +66,69 @@ const emptyForm: FormData = {
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function StarPicker({ value, onChange, label }: { value: number; onChange: (v: number) => void; label: string }) {
+function starColor(n: number, active: boolean, max: number) {
+  if (!active) return 'text-edge'
+  if (max === 10) {
+    if (n <= 4) return 'text-red-500'
+    if (n <= 6) return 'text-amber-400'
+    return 'text-brand-400'
+  }
+  // escala 1-5
+  if (n <= 2) return 'text-red-500'
+  if (n === 3) return 'text-amber-400'
+  return 'text-brand-400'
+}
+
+function starLabel10(v: number) {
+  if (!v) return ''
+  if (v <= 2) return 'Péssimo'
+  if (v <= 4) return 'Ruim'
+  if (v <= 6) return 'Regular'
+  if (v <= 8) return 'Bom'
+  return 'Excelente'
+}
+
+function starLabel5(v: number) {
+  if (!v) return ''
+  if (v === 1) return 'Péssimo'
+  if (v === 2) return 'Ruim'
+  if (v === 3) return 'Regular'
+  if (v === 4) return 'Bom'
+  return 'Excelente'
+}
+
+function StarPicker({ value, onChange, label, max = 5 }: { value: number; onChange: (v: number) => void; label: string; max?: number }) {
   const [hover, setHover] = useState(0)
+  const active = hover || value
+  const is10 = max === 10
+
+  const labelColor = is10
+    ? (active <= 4 ? '#ef4444' : active <= 6 ? '#f59e0b' : '#3fb950')
+    : (active <= 2 ? '#ef4444' : active === 3 ? '#f59e0b' : '#3fb950')
+
+  const labelText = is10 ? starLabel10(value) : starLabel5(value)
+
   return (
     <div>
       <p className="text-sm font-medium text-fg mb-2">{label}</p>
-      <div className="flex gap-1">
-        {[1, 2, 3, 4, 5].map((n) => (
+      <div className="flex flex-wrap gap-0.5 items-center">
+        {Array.from({ length: max }, (_, i) => i + 1).map((n) => (
           <button key={n} type="button"
             onMouseEnter={() => setHover(n)} onMouseLeave={() => setHover(0)}
-            onClick={() => onChange(n)} className="text-2xl transition-transform hover:scale-110">
-            <span className={(hover || value) >= n ? 'text-amber-400' : 'text-edge'}>★</span>
+            onClick={() => onChange(n)}
+            className={`transition-transform hover:scale-110 ${is10 ? 'text-xl' : 'text-2xl'}`}>
+            <span className={starColor(n, active >= n, max)}>★</span>
           </button>
         ))}
-        {value > 0 && <span className="ml-2 text-sm text-fg-muted self-center">{value}/5</span>}
+        {value > 0 && (
+          <span className="ml-2 text-sm font-semibold self-center" style={{ color: labelColor }}>
+            {value}/{max} — {labelText}
+          </span>
+        )}
       </div>
+      {is10 && (
+        <p className="text-xs text-fg-subtle mt-1">1–4 negativo · 5–6 regular · 7–10 positivo</p>
+      )}
     </div>
   )
 }
@@ -255,8 +304,7 @@ export default function AvaliarPage() {
         ? form.assessment_styles[0]
         : 'misto'
 
-    const payload = {
-      author_id: user.id,
+    const result = await submitReview({
       teacher_id: form.teacher_id,
       subject_id: form.subject_id,
       curriculum_version_id: profileVersionId,
@@ -265,7 +313,7 @@ export default function AvaliarPage() {
       rating_organization: form.rating_organization,
       rating_workload: form.rating_workload,
       rating_difficulty: form.rating_difficulty,
-      would_recommend: form.would_recommend,
+      would_recommend: form.would_recommend!,
       teacher_absence: form.teacher_absence,
       teacher_is_engaging: form.teacher_is_engaging,
       is_easy_to_pass: form.is_easy_to_pass,
@@ -277,13 +325,11 @@ export default function AvaliarPage() {
       comment: form.comment.trim() || null,
       had_in_person_event: isEad ? form.had_in_person_event : null,
       relevant_to_course: isEad ? form.relevant_to_course : null,
-    }
+    })
 
-    const { error: err } = await (supabase as any).from('reviews').insert(payload)
     setSubmitting(false)
-    if (err) {
-      if (err.code === '23505') setError('Você já avaliou este professor nesta disciplina.')
-      else setError('Erro ao enviar. Tente novamente.')
+    if (result.error) {
+      setError(result.error)
       return
     }
     setSuccess(true)
@@ -414,7 +460,7 @@ export default function AvaliarPage() {
             {' '}em <strong className="text-fg">{selectedSubject?.name}</strong>
           </div>
 
-          <StarPicker label="Nota geral" value={form.rating_general} onChange={(v) => set({ rating_general: v })} />
+          <StarPicker label="Nota geral" value={form.rating_general} onChange={(v) => set({ rating_general: v })} max={10} />
           <StarPicker label="Didática" value={form.rating_didactics} onChange={(v) => set({ rating_didactics: v })} />
           <StarPicker label="Organização das aulas" value={form.rating_organization} onChange={(v) => set({ rating_organization: v })} />
           <StarPicker label="Carga de trabalho" value={form.rating_workload} onChange={(v) => set({ rating_workload: v })} />

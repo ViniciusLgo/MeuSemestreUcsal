@@ -11,6 +11,8 @@ import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { StarRating } from '@/components/ui/StarRating'
 import { Avatar } from '@/components/ui/Avatar'
+import { SuggestTeacherButton } from '@/components/ui/SuggestTeacherButton'
+import { ReportButton } from '@/components/ui/ReportButton'
 import type { Metadata } from 'next'
 
 interface Props {
@@ -53,9 +55,10 @@ const examTypeLabel: Record<string, string> = {
   oral: 'Oral',
 }
 
-function ratingColor(n: number) {
-  if (n >= 4) return 'text-brand-400'
-  if (n >= 3) return 'text-amber-400'
+function ratingColor(n: number, max = 5) {
+  const t = max === 10 ? [7, 5] : [4, 3]
+  if (n >= t[0]) return 'text-brand-400'
+  if (n >= t[1]) return 'text-amber-400'
   return 'text-red-400'
 }
 
@@ -93,9 +96,9 @@ export default async function SubjectPage({ params }: Props) {
         <div className="flex items-center gap-3">
           {reviews.length > 0 ? (
             <>
-              <StarRating value={avgGeneral} />
-              <span className="text-lg font-bold text-fg">{avgGeneral.toFixed(1)}</span>
-              <span className="text-fg-subtle text-sm">({reviews.length} avaliações)</span>
+              <StarRating value={avgGeneral} max={10} />
+              <span className={`text-lg font-bold ${ratingColor(avgGeneral, 10)}`}>{avgGeneral.toFixed(1)}</span>
+              <span className="text-fg-subtle text-sm">/ 10 ({reviews.length} avaliações)</span>
             </>
           ) : (
             <span className="text-fg-subtle text-sm">Nenhuma avaliação ainda — seja o primeiro!</span>
@@ -164,6 +167,11 @@ export default async function SubjectPage({ params }: Props) {
         </div>
       )}
 
+      {/* ── Sugerir professor ────────────────────────────────────────── */}
+      <div className="mb-10">
+        <SuggestTeacherButton subjectId={subject.id} subjectName={subject.name} />
+      </div>
+
       {/* ── Avaliações ───────────────────────────────────────────────── */}
       <div>
         <div className="flex items-center justify-between mb-4">
@@ -200,9 +208,9 @@ export default async function SubjectPage({ params }: Props) {
                       </Link>
                     )}
                     <div className="flex items-center gap-2 mt-1">
-                      <StarRating value={review.rating_general} size="sm" />
-                      <span className={`text-sm font-bold ${ratingColor(review.rating_general)}`}>
-                        {review.rating_general}/5
+                      <StarRating value={review.rating_general} max={10} size="sm" />
+                      <span className={`text-sm font-bold ${ratingColor(review.rating_general, 10)}`}>
+                        {review.rating_general}/10
                       </span>
                     </div>
                   </div>
@@ -267,9 +275,12 @@ export default async function SubjectPage({ params }: Props) {
                   </p>
                 )}
 
-                <p className="text-xs text-fg-subtle mt-3">
-                  {new Date(review.created_at).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
-                </p>
+                <div className="flex items-center justify-between mt-3">
+                  <p className="text-xs text-fg-subtle">
+                    {new Date(review.created_at).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                  </p>
+                  <ReportButton reviewId={review.id} />
+                </div>
               </Card>
             ))}
           </div>

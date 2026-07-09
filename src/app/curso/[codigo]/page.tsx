@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getCourseByCode, getCurriculumWithSubjects } from '@/lib/queries/courses'
+import { createClient } from '@/lib/supabase/server'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import type { Metadata } from 'next'
@@ -60,6 +61,24 @@ export default async function CoursePage({ params, searchParams }: Props) {
 
   const mandatory = subjects.filter((s) => s.subject?.type === 'mandatory')
   const electives = subjects.filter((s) => s.subject?.type === 'elective')
+
+  // Busca contagem de avaliações por disciplina (somando todos os professores)
+  const subjectIds = subjects
+    .map((item) => item.subject?.id)
+    .filter((id): id is string => Boolean(id))
+
+  const reviewCounts: Record<string, number> = {}
+  if (subjectIds.length > 0) {
+    const supabase = await createClient()
+    const { data: reviewRows } = await (supabase as any)
+      .from('reviews')
+      .select('subject_id')
+      .in('subject_id', subjectIds)
+      .eq('status', 'publicada')
+    reviewRows?.forEach((r: { subject_id: string }) => {
+      reviewCounts[r.subject_id] = (reviewCounts[r.subject_id] ?? 0) + 1
+    })
+  }
 
   const bySemester = mandatory.reduce<Record<number, CurriculumItem[]>>((acc, item) => {
     const num = item.semester?.number ?? 0
@@ -159,9 +178,16 @@ export default async function CoursePage({ params, searchParams }: Props) {
                     <span className="text-[10px] font-mono text-fg-subtle bg-surface-2 px-1.5 py-0.5 rounded">
                       {item.subject?.code}
                     </span>
-                    {item.subject?.modality === 'ead' && (
-                      <Badge variant="ead" className="flex-shrink-0">EAD</Badge>
-                    )}
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      {item.subject?.modality === 'ead' && (
+                        <Badge variant="ead">EAD</Badge>
+                      )}
+                      {(reviewCounts[item.subject?.id ?? ''] ?? 0) > 0 && (
+                        <span className="text-[10px] font-medium text-brand-400 bg-brand-100 px-1.5 py-0.5 rounded-full">
+                          {reviewCounts[item.subject?.id ?? '']} av.
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <p className="text-sm font-semibold text-fg leading-snug group-hover:text-brand-400 transition-colors">
                     {item.subject?.name}
@@ -194,7 +220,14 @@ export default async function CoursePage({ params, searchParams }: Props) {
                     <span className="text-[10px] font-mono text-fg-subtle bg-surface-2 px-1.5 py-0.5 rounded">
                       {item.subject?.code}
                     </span>
-                    <Badge variant="ead" className="flex-shrink-0">EAD</Badge>
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <Badge variant="ead">EAD</Badge>
+                      {(reviewCounts[item.subject?.id ?? ''] ?? 0) > 0 && (
+                        <span className="text-[10px] font-medium text-brand-400 bg-brand-100 px-1.5 py-0.5 rounded-full">
+                          {reviewCounts[item.subject?.id ?? '']} av.
+                        </span>
+                      )}
+                    </div>
                   </div>
                   <p className="text-sm font-semibold text-fg leading-snug group-hover:text-accent-400 transition-colors">
                     {item.subject?.name}

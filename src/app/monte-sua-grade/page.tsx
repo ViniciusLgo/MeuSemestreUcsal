@@ -3,6 +3,11 @@ import { GradeBuilder } from './GradeBuilder'
 
 export const metadata: Metadata = { title: 'Monte sua grade — MeuSemestreUCSAL' }
 
-export default function MonteGradePage() {
-  return <GradeBuilder />
+export default async function MonteGradePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ grade?: string }>
+}) {
+  const params = await searchParams
+  return <GradeBuilder gradeId={params.grade} />
 }
