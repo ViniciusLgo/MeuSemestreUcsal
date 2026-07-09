@@ -4,6 +4,27 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
+export type SavedGradeData = {
+  id: string
+  name: string
+  course_code: string
+  semesters: number[]
+  items: GradeItem[]
+}
+
+export async function getSavedGrade(id: string): Promise<SavedGradeData | null> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return null
+  const { data } = await (supabase as any)
+    .from('saved_grades')
+    .select('id, name, course_code, semesters, items')
+    .eq('id', id)
+    .eq('user_id', user.id)
+    .single()
+  return data ?? null
+}
+
 async function requireAuth() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

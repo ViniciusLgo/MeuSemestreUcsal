@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { StarRating } from '@/components/ui/StarRating'
@@ -186,6 +186,9 @@ export function GradeBuilder({ gradeId }: { gradeId?: string }) {
   const [savedMsg, setSavedMsg] = useState<string | null>(null)
   const [displayCache, setDisplayCache] = useState<Record<string, { subject_name: string; subject_code: string; teacher_name: string; colorIdx: number }>>({})
 
+  // Protege o state de restore de ser limpo pela troca de curso
+  const isRestoringRef = useRef(false)
+
   const maxSemesters = COURSES.find((c) => c.code === course)?.semesters ?? 8
 
   useEffect(() => {
@@ -200,13 +203,16 @@ export function GradeBuilder({ gradeId }: { gradeId?: string }) {
       setVersions(data ?? [])
     }
     load()
-    setActiveSemesters([1])
-    setSlots([])
-    setSelections({})
-    setColorMap({})
-    setSlotConfigs({})
-    setDisplayCache({})
-    setExpandedSchedule(null)
+    if (!isRestoringRef.current) {
+      setActiveSemesters([1])
+      setSlots([])
+      setSelections({})
+      setColorMap({})
+      setSlotConfigs({})
+      setDisplayCache({})
+      setExpandedSchedule(null)
+    }
+    isRestoringRef.current = false
   }, [course])
 
   useEffect(() => {
@@ -260,6 +266,7 @@ export function GradeBuilder({ gradeId }: { gradeId?: string }) {
     if (!gradeId) return
     getSavedGrade(gradeId).then((saved) => {
       if (!saved) return
+      isRestoringRef.current = true
       setCourse(saved.course_code)
       setActiveSemesters(saved.semesters)
       setSaveName(saved.name)
