@@ -12,7 +12,7 @@ const courses = [
     subjects: 42,
     description:
       'Formação completa em desenvolvimento, arquitetura, qualidade e gestão de software.',
-    variant: 'info' as const,
+    variant: 'default' as const,
     gradient: 'from-[#238636] to-[#196127]',
   },
   {

@@ -1,6 +1,32 @@
 import Link from 'next/link'
+import { createClient } from '@/lib/supabase/server'
 
-export function HeroSection() {
+async function getStats() {
+  const supabase = await createClient()
+  const [disciplinasRes, cursosRes, eletivasRes, avaliacoesRes] = await Promise.all([
+    (supabase as any).from('subjects').select('id', { count: 'exact', head: true }).eq('active', true),
+    (supabase as any).from('courses').select('id', { count: 'exact', head: true }).eq('active', true),
+    (supabase as any).from('subjects').select('id', { count: 'exact', head: true }).eq('active', true).eq('type', 'elective').eq('modality', 'ead'),
+    (supabase as any).from('reviews').select('id', { count: 'exact', head: true }).eq('status', 'publicada'),
+  ])
+  return {
+    disciplinas: disciplinasRes.count ?? 0,
+    cursos: cursosRes.count ?? 0,
+    eletivas: eletivasRes.count ?? 0,
+    avaliacoes: avaliacoesRes.count ?? 0,
+  }
+}
+
+export async function HeroSection() {
+  const stats = await getStats()
+
+  const statItems = [
+    { label: 'Disciplinas mapeadas', value: stats.disciplinas > 0 ? `${stats.disciplinas}+` : '—' },
+    { label: 'Cursos disponíveis', value: String(stats.cursos) },
+    { label: 'Eletivas EAD', value: stats.eletivas > 0 ? `${stats.eletivas}+` : '—' },
+    { label: 'Avaliações publicadas', value: String(stats.avaliacoes) },
+  ]
+
   return (
     <section className="relative overflow-hidden bg-canvas">
       {/* Gradiente verde sutil */}
@@ -60,12 +86,7 @@ export function HeroSection() {
         </div>
 
         <div className="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 pt-10 border-t border-edge-muted">
-          {[
-            { label: 'Disciplinas mapeadas', value: '60+' },
-            { label: 'Cursos disponíveis', value: '2' },
-            { label: 'Eletivas EAD', value: '20+' },
-            { label: 'Avaliações publicadas', value: '0' },
-          ].map((stat) => (
+          {statItems.map((stat) => (
             <div key={stat.label} className="text-center">
               <div className="text-3xl font-bold text-fg tabular-nums">{stat.value}</div>
               <div className="text-sm text-fg-subtle mt-1">{stat.label}</div>
