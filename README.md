@@ -35,14 +35,16 @@ O MeuSemestreUCSAL resolve dois problemas reais dos alunos do campus Pituaçu:
 ## Funcionalidades
 
 ### Área pública
+- Lista completa de professores com nota, disciplinas vinculadas e contagem de avaliações
 - Perfil de professor com nota geral (1–10) e notas por disciplina
 - Página de disciplina com professores e suas notas, badge de quantidade de avaliações
 - Busca por professor ou disciplina
-- FAQ com calendário de rematrícula 2026.2
-- Páginas de Atualizações (changelog), Privacidade/LGPD e Termos de Uso
+- Páginas de curso (BES e ADS) com grade curricular
+- FAQ com calendário de rematrícula
+- Changelog público, Política de Privacidade/LGPD e Termos de Uso
 
 ### Área do aluno (login com @ucsal.edu.br)
-- Avaliar professor anonimamente: nota geral 1–10 com zonas de cor, sub-ratings 1–5 (didática, organização, carga), dificuldade, recomendação, faltas, engajamento, estilo de prova
+- Avaliar professor anonimamente: nota geral 1–10, sub-ratings 1–5 (didática, organização, carga, dificuldade), recomendação, faltas, engajamento, estilo de prova
 - Reportar avaliação inadequada com motivo e detalhes
 - Sugerir professor para disciplina sem docente cadastrado
 - Montar grade semanal interativa (Manhã/Noite, Segunda a Sábado)
@@ -57,20 +59,21 @@ O MeuSemestreUCSAL resolve dois problemas reais dos alunos do campus Pituaçu:
 - Notificações Telegram para todas as ações relevantes
 
 ### Notificações Telegram
-O bot `@avaliacaoucsalbot` envia mensagens ao admin para:
+O bot Telegram envia mensagens ao admin para:
 - Nova avaliação publicada ou enviada para revisão
 - Avaliação removida pelo aluno
 - Avaliação reportada por outro aluno
 - Novo usuário cadastrado
 - Disciplina pendente de professor
 - Sugestão de professor enviada por aluno
+- Usuário banido
 
 ---
 
 ## Estrutura do banco de dados
 
 ```
-courses                  Cursos (BES, ADS)
+courses                  Cursos disponíveis
 curriculum_versions      Versões da matriz (ano, turno, campus)
 semesters                Períodos dentro de cada versão
 subjects                 Disciplinas (obrigatórias + eletivas EAD)
@@ -95,7 +98,7 @@ Todas as tabelas com dados de usuário têm **Row Level Security (RLS)** ativo n
 - Node.js 20+
 - Conta no [Supabase](https://supabase.com) (plano free é suficiente)
 - Conta no [Resend](https://resend.com) para envio de OTP
-- Bot do Telegram (opcional, para notificações)
+- Bot do Telegram (opcional, para notificações admin)
 
 ### 1. Clone e instale
 
@@ -107,19 +110,10 @@ npm install
 
 ### 2. Variáveis de ambiente
 
-Crie `.env.local` na raiz:
+Copie `.env.example` para `.env.local` e preencha:
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://<seu-projeto>.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<sua-anon-key>
-SUPABASE_SERVICE_ROLE_KEY=<sua-service-role-key>
-
-# Telegram (opcional — notificações admin)
-TELEGRAM_BOT_TOKEN=<token-do-botfather>
-TELEGRAM_ADMIN_CHAT_ID=<seu-chat-id>
-
-# URL de produção (para links nos alertas Telegram)
-NEXT_PUBLIC_BASE_URL=http://localhost:3000
+```bash
+cp .env.example .env.local
 ```
 
 > A `SUPABASE_SERVICE_ROLE_KEY` é usada apenas server-side (Server Actions). Nunca a exponha no client.
@@ -131,14 +125,18 @@ Para obter o `TELEGRAM_ADMIN_CHAT_ID`: inicie uma conversa com o bot, acesse `/a
 Execute os arquivos SQL na pasta `/sql` no **SQL Editor do Supabase**, nesta ordem:
 
 ```
-sql/schema.sql                   -- Tabelas principais + RLS + triggers
-sql/seed_courses.sql             -- Cursos BES e ADS
-sql/seed_curriculum.sql          -- Matrizes 2023, semestres, disciplinas
-sql/saved_grades.sql             -- Tabela de grades salvas
-sql/subject_alert_status.sql     -- Coluna de alerta para disciplinas sem professor
-sql/teacher_suggestions.sql      -- Tabela de sugestões de professores
-sql/rating_scale_migration.sql   -- Migração da escala 1-5 → 1-10 (se já tiver dados)
-sql/vincular_professores.sql     -- Vínculos professor ↔ disciplina (opcional)
+sql/schema.sql                    Tabelas principais + RLS + triggers
+sql/seed_courses.sql              Cursos
+sql/seed_curriculum.sql           Matrizes, semestres, disciplinas
+sql/saved_grades.sql              Tabela de grades salvas
+sql/subject_alert_status.sql      Coluna de alerta para disciplinas sem professor
+sql/teacher_suggestions.sql       Tabela de sugestões de professores
+sql/rating_scale_migration.sql    Migração da escala 1-5 → 1-10 (só se já tiver dados)
+sql/vincular_professores.sql      Vínculos professor ↔ disciplina (batch 1)
+sql/vincular_professores_2.sql    Vínculos professor ↔ disciplina (batch 2)
+sql/vincular_professores_3.sql    Vínculos professor ↔ disciplina (batch 3)
+sql/vincular_professores_4.sql    Vínculos professor ↔ disciplina (batch 4)
+sql/merge_professores_duplicados.sql  Remove professores duplicados (roda após vincular)
 ```
 
 ### 4. Configurar admin
@@ -174,13 +172,7 @@ Acesse `http://localhost:3000`. O painel admin fica em `http://localhost:3000/pa
 
 1. Suba o repositório no GitHub
 2. Importe no [Vercel](https://vercel.com/new)
-3. Configure as variáveis de ambiente no painel do Vercel:
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_ADMIN_CHAT_ID`
-   - `NEXT_PUBLIC_BASE_URL` (URL de produção, ex: `https://meusemestre.vercel.app`)
+3. Configure as variáveis de ambiente no painel do Vercel (veja `.env.example`)
 4. Deploy automático a cada push na branch `master`
 
 ---
@@ -203,10 +195,11 @@ src/
     perfil/                Perfil e configuração do aluno
     privacidade/           Política de privacidade / LGPD
     professor/[id]/        Página do professor
+    professores/           Listagem pública de todos os professores
     termos/                Termos de uso
   components/
-    home/                  HeroSection (stats reais), CourseCards
-    layout/                Header, Footer (com links legais), SignOut
+    home/                  HeroSection, CourseCards
+    layout/                Header, Footer, SignOut
     ui/                    Avatar, Badge, Card, StarRating, ReportButton, SuggestTeacherButton
   lib/
     actions/               Server Actions (admin, grade, student)
@@ -215,9 +208,9 @@ src/
     supabase/              Clients (server e client)
     telegram.ts            Funções de notificação Telegram
   types/
-    database.ts            Tipos gerados do Supabase
+    database.ts            Tipos do banco de dados
 sql/
-  *.sql                    Migrações e seeds
+  *.sql                    Migrações, seeds e vínculos
 ```
 
 ---
@@ -235,4 +228,4 @@ sql/
 
 ## Licença
 
-Projeto educacional independente. Uso permitido para fins não comerciais com atribuição.
+MIT License — veja `LICENSE` para detalhes.
