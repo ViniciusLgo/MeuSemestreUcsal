@@ -5,9 +5,12 @@ import { getProfile } from '@/lib/queries/profiles'
 const NAV = [
   { href: '/painel-interno', label: 'Dashboard' },
   { href: '/painel-interno/professores', label: 'Professores' },
+  { href: '/painel-interno/sem-professor', label: 'Sem professor ⚠' },
+  { href: '/painel-interno/sugestoes', label: 'Sugestões 💡' },
   { href: '/painel-interno/matrizes', label: 'Matrizes' },
   { href: '/painel-interno/avaliacoes', label: 'Avaliações' },
   { href: '/painel-interno/usuarios', label: 'Usuários' },
+  { href: '/painel-interno/configuracoes', label: 'Configurações' },
 ]
 
 export default async function PainelLayout({ children }: { children: React.ReactNode }) {
