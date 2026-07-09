@@ -56,10 +56,9 @@ export default function ConfiguracoesPage() {
                 <li>
                   Adicione ao <code className="bg-surface-2 px-1.5 py-0.5 rounded text-brand-400">.env.local</code>:
                   <pre className="mt-2 bg-canvas border border-edge rounded-lg p-3 text-xs font-mono text-fg-muted overflow-x-auto">
-{`TELEGRAM_BOT_TOKEN=8864992815:AAGa7H4H_07poTZXS5kJT4dizNUUD55IElQ
+{`TELEGRAM_BOT_TOKEN=<token_do_botfather>
 TELEGRAM_ADMIN_CHAT_ID=<seu_chat_id>`}
                   </pre>
-                  <p className="text-xs text-red-400 mt-1">⚠️ O token acima foi exposto — regenere em @BotFather com /revoke antes do deploy.</p>
                 </li>
                 <li>Reinicie o servidor (<code className="bg-surface-2 px-1.5 py-0.5 rounded text-brand-400">npm run dev</code>)</li>
                 <li>
