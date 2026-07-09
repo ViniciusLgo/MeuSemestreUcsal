@@ -48,7 +48,7 @@ export type ReviewByTeacher = {
   attendance_pressure: 'baixa' | 'media' | 'alta' | null
   assessment_style: 'prova' | 'projeto' | 'trabalho' | 'misto' | null
   teacher_absence: 'nunca' | 'raramente' | 'frequente' | null
-  is_easy_to_pass: boolean | null
+  is_easy_to_pass: 'sim' | 'mais_ou_menos' | 'nao' | null
   teacher_is_engaging: boolean | null
   exam_types: string[] | null
   has_assignments: boolean | null

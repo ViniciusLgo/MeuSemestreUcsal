@@ -59,8 +59,8 @@ export default async function TeacherPage({ params }: Props) {
   // Contagens de campos novos
   const engagedCount = reviews.filter(r => r.teacher_is_engaging === true).length
   const lazyCount = reviews.filter(r => r.teacher_is_engaging === false).length
-  const easyCount = reviews.filter(r => r.is_easy_to_pass === true).length
-  const hardCount = reviews.filter(r => r.is_easy_to_pass === false).length
+  const easyCount = reviews.filter(r => r.is_easy_to_pass === 'sim').length
+  const hardCount = reviews.filter(r => r.is_easy_to_pass === 'nao').length
   const absFreq = reviews.filter(r => r.teacher_absence === 'frequente').length
 
   return (
@@ -230,8 +230,9 @@ export default async function TeacherPage({ params }: Props) {
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {review.would_recommend && <Badge variant="success">✓ Recomenda</Badge>}
-                    {review.is_easy_to_pass === true && <Badge variant="success">Fácil de passar</Badge>}
-                    {review.is_easy_to_pass === false && <Badge variant="warning">Difícil de passar</Badge>}
+                    {review.is_easy_to_pass === 'sim' && <Badge variant="success">Fácil de passar</Badge>}
+                    {review.is_easy_to_pass === 'mais_ou_menos' && <Badge variant="default">Mais ou menos</Badge>}
+                    {review.is_easy_to_pass === 'nao' && <Badge variant="warning">Difícil de passar</Badge>}
                     {review.teacher_is_engaging === false && <Badge variant="warning">Enrolado</Badge>}
                     {review.teacher_absence === 'frequente' && <Badge variant="warning">Falta bastante</Badge>}
                     {review.assessment_style && (
