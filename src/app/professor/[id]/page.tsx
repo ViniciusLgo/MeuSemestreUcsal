@@ -8,6 +8,7 @@ import { Avatar } from '@/components/ui/Avatar'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { StarRating } from '@/components/ui/StarRating'
+import { ReportButton } from '@/components/ui/ReportButton'
 import type { Metadata } from 'next'
 
 interface Props { params: Promise<{ id: string }> }
@@ -23,9 +24,10 @@ function avg(reviews: ReviewByTeacher[], key: keyof ReviewByTeacher): number {
   return reviews.reduce((s, r) => s + Number(r[key] ?? 0), 0) / reviews.length
 }
 
-function ratingColor(n: number) {
-  if (n >= 4) return 'text-brand-400'
-  if (n >= 3) return 'text-amber-400'
+function ratingColor(n: number, max = 5) {
+  const t = max === 10 ? [7, 5] : [4, 3]
+  if (n >= t[0]) return 'text-brand-400'
+  if (n >= t[1]) return 'text-amber-400'
   return 'text-red-400'
 }
 
@@ -80,9 +82,9 @@ export default async function TeacherPage({ params }: Props) {
             </p>
             {reviews.length > 0 && (
               <div className="flex items-center gap-2">
-                <StarRating value={avgGeneral} />
-                <span className={`font-bold text-xl ${ratingColor(avgGeneral)}`}>{avgGeneral.toFixed(1)}</span>
-                <span className="text-fg-subtle text-sm">nota geral</span>
+                <StarRating value={avgGeneral} max={10} />
+                <span className={`font-bold text-xl ${ratingColor(avgGeneral, 10)}`}>{avgGeneral.toFixed(1)}</span>
+                <span className="text-fg-subtle text-sm">/ 10</span>
               </div>
             )}
           </div>
@@ -203,8 +205,8 @@ export default async function TeacherPage({ params }: Props) {
                       </Link>
                     )}
                     <div className="flex items-center gap-2 mt-1">
-                      <StarRating value={review.rating_general} size="sm" />
-                      <span className={`text-sm font-bold ${ratingColor(review.rating_general)}`}>{review.rating_general}/5</span>
+                      <StarRating value={review.rating_general} max={10} size="sm" />
+                      <span className={`text-sm font-bold ${ratingColor(review.rating_general, 10)}`}>{review.rating_general}/10</span>
                     </div>
                   </div>
                   <div className="flex flex-wrap gap-1.5">
@@ -254,9 +256,12 @@ export default async function TeacherPage({ params }: Props) {
                   </p>
                 )}
 
-                <p className="text-xs text-fg-subtle mt-3">
-                  {new Date(review.created_at).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
-                </p>
+                <div className="flex items-center justify-between mt-3">
+                  <p className="text-xs text-fg-subtle">
+                    {new Date(review.created_at).toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}
+                  </p>
+                  <ReportButton reviewId={review.id} />
+                </div>
               </Card>
             ))}
           </div>
