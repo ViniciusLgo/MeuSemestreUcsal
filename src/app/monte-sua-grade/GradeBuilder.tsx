@@ -8,7 +8,7 @@ import {
   ScheduleGrid, SUBJECT_COLORS, DAYS, ALL_SLOTS, PERIODS,
   type ScheduleMap, type ScheduleSlot,
 } from './ScheduleGrid'
-import { saveGrade } from '@/lib/actions/grade'
+import { saveGrade, getSavedGrade } from '@/lib/actions/grade'
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -168,7 +168,7 @@ async function fetchSlotsForSemester(
 
 // ─── Componente ───────────────────────────────────────────────────────────────
 
-export function GradeBuilder() {
+export function GradeBuilder({ gradeId }: { gradeId?: string }) {
   const [course, setCourse] = useState('BES')
   const [versions, setVersions] = useState<CurriculumVersion[]>([])
   const [activeSemesters, setActiveSemesters] = useState<number[]>([1])
@@ -254,6 +254,37 @@ export function GradeBuilder() {
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slots])
+
+  // ─── Restaurar grade salva ────────────────────────────────────────────────
+  useEffect(() => {
+    if (!gradeId) return
+    getSavedGrade(gradeId).then((saved) => {
+      if (!saved) return
+      setCourse(saved.course_code)
+      setActiveSemesters(saved.semesters)
+      setSaveName(saved.name)
+      const newSelections: Selections = {}
+      const newColorMap: ColorMap = {}
+      const newSlotConfigs: SlotConfigs = {}
+      const newDisplayCache: Record<string, { subject_name: string; subject_code: string; teacher_name: string; colorIdx: number }> = {}
+      for (const item of saved.items) {
+        newSelections[item.subject_id] = item.teacher_id
+        newColorMap[item.subject_id] = item.colorIdx
+        newSlotConfigs[item.subject_id] = { days: item.days, slotId: item.slotId, numSlots: item.numSlots }
+        newDisplayCache[item.subject_id] = {
+          subject_name: item.subject_name,
+          subject_code: item.subject_code,
+          teacher_name: item.teacher_name,
+          colorIdx: item.colorIdx,
+        }
+      }
+      setSelections(newSelections)
+      setColorMap(newColorMap)
+      setSlotConfigs(newSlotConfigs)
+      setDisplayCache(newDisplayCache)
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gradeId])
 
   // ─── ScheduleMap ──────────────────────────────────────────────────────────
   const scheduleMap: ScheduleMap = {}
@@ -714,9 +745,15 @@ export function GradeBuilder() {
                                 </div>
                               </div>
 
-                              <button onClick={() => setExpandedSchedule(null)}
-                                className="w-full py-2 rounded-xl bg-brand-600 text-white text-sm font-bold hover:bg-brand-700 transition-colors mt-1">
-                                ✓ Confirmar horário
+                              <button
+                                onClick={() => !conflictCode && setExpandedSchedule(null)}
+                                disabled={!!conflictCode}
+                                className={`w-full py-2 rounded-xl text-sm font-bold transition-colors mt-1 ${
+                                  conflictCode
+                                    ? 'bg-[#2d0a0a] border border-red-700 text-red-400 cursor-not-allowed'
+                                    : 'bg-brand-600 text-white hover:bg-brand-700'
+                                }`}>
+                                {conflictCode ? `⚠ Resolva o conflito com ${conflictCode} antes de confirmar` : '✓ Confirmar horário'}
                               </button>
                             </div>
                           )}
