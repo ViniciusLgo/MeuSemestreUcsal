@@ -1,22 +1,41 @@
 'use client'
 
-export const MORNING_SLOTS = [
-  { id: 0, label: '07:00', range: '07:00–07:50' },
-  { id: 1, label: '07:50', range: '07:50–08:40' },
-  { id: 2, label: '08:40', range: '08:40–09:30' },
-  { id: 3, label: '09:30', range: '09:30–10:20' },
-  { id: 4, label: '10:20', range: '10:20–11:10' },
-]
+// ─── Horários reais da UCSAL (blocos de 75 min) ───────────────────────────────
 
-export const NIGHT_SLOTS = [
-  { id: 0, label: '19:00', range: '19:00–19:50' },
-  { id: 1, label: '19:50', range: '19:50–20:40' },
-  { id: 2, label: '20:40', range: '20:40–21:30' },
-  { id: 3, label: '21:30', range: '21:30–22:20' },
-]
+export const MANHA_SLOTS = [
+  { id: 0, label: '07:00', range: '07:00–08:15' },
+  { id: 1, label: '08:25', range: '08:25–09:40' },
+  { id: 2, label: '09:50', range: '09:50–11:05' },
+  { id: 3, label: '11:15', range: '11:15–12:30' },
+] as const
 
-export const DAYS = ['SEG', 'TER', 'QUA', 'QUI', 'SEX'] as const
+export const TARDE_SLOTS = [
+  { id: 4, label: '13:00', range: '13:00–14:15' },
+  { id: 5, label: '14:25', range: '14:25–15:40' },
+  { id: 6, label: '15:50', range: '15:50–17:05' },
+  { id: 7, label: '17:15', range: '17:15–18:30' },
+] as const
+
+export const NOITE_SLOTS = [
+  { id: 8, label: '19:00', range: '19:00–20:15' },
+  { id: 9, label: '20:25', range: '20:25–21:40' },
+] as const
+
+export type TimeSlot = { id: number; label: string; range: string }
+export const ALL_SLOTS: TimeSlot[] = [...MANHA_SLOTS, ...TARDE_SLOTS, ...NOITE_SLOTS]
+
+export const PERIODS = [
+  { label: 'Manhã',  slots: MANHA_SLOTS as unknown as TimeSlot[] },
+  { label: 'Tarde',  slots: TARDE_SLOTS as unknown as TimeSlot[] },
+  { label: 'Noite',  slots: NOITE_SLOTS as unknown as TimeSlot[] },
+] as const
+
+// ─── Dias ─────────────────────────────────────────────────────────────────────
+
+export const DAYS = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SAB'] as const
 export type Day = typeof DAYS[number]
+
+// ─── Cores ────────────────────────────────────────────────────────────────────
 
 export const SUBJECT_COLORS = [
   { bg: 'bg-emerald-500', hex: '#10b981' },
@@ -31,6 +50,8 @@ export const SUBJECT_COLORS = [
   { bg: 'bg-pink-500',    hex: '#ec4899' },
 ]
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 export type ScheduleSlot = {
   subject_id: string
   subject_name: string
@@ -43,61 +64,105 @@ export type ScheduleMap = Record<string, ScheduleSlot | undefined>
 
 interface Props {
   scheduleMap: ScheduleMap
-  shift: string | null
   onRemove: (key: string) => void
   compact?: boolean
+  /** Quais períodos mostrar. undefined = todos */
+  periods?: Array<'manha' | 'tarde' | 'noite'>
 }
 
-export function ScheduleGrid({ scheduleMap, shift, onRemove, compact = false }: Props) {
-  const slots = shift?.toLowerCase() === 'noturno' ? NIGHT_SLOTS : MORNING_SLOTS
+// ─── Componente ───────────────────────────────────────────────────────────────
+
+export function ScheduleGrid({ scheduleMap, onRemove, compact = false, periods }: Props) {
+  const hasAnyCell = Object.keys(scheduleMap).length > 0
+
+  const visiblePeriods = PERIODS.filter((p) => {
+    if (!periods) return true
+    if (p.label === 'Manhã')  return periods.includes('manha')
+    if (p.label === 'Tarde')  return periods.includes('tarde')
+    if (p.label === 'Noite')  return periods.includes('noite')
+    return true
+  })
+
+  // Filtra só os períodos que têm pelo menos uma célula ocupada (ou todos se nada marcado)
+  const periodsToShow = hasAnyCell
+    ? visiblePeriods.filter((period) =>
+        period.slots.some((slot) =>
+          DAYS.some((day) => !!scheduleMap[`${day}:${slot.id}`])
+        )
+      )
+    : visiblePeriods
+
+  // Se nenhum período tem célula mas há grade, mostra todos os visíveis
+  const finalPeriods = periodsToShow.length > 0 ? periodsToShow : visiblePeriods
+
+  const dayLabels: Record<string, string> = {
+    SEG: compact ? 'S' : 'Seg',
+    TER: compact ? 'T' : 'Ter',
+    QUA: compact ? 'Q' : 'Qua',
+    QUI: compact ? 'Q' : 'Qui',
+    SEX: compact ? 'S' : 'Sex',
+    SAB: compact ? 'S' : 'Sáb',
+  }
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-collapse text-xs">
+      <table className="w-full border-collapse" style={{ fontSize: compact ? 10 : 11 }}>
         <thead>
           <tr>
-            <th className={`text-fg-subtle font-medium text-right pr-2 ${compact ? 'w-14' : 'w-20'}`} />
+            <th className={`text-fg-subtle font-medium text-right pr-2 ${compact ? 'w-12' : 'w-20'}`} />
             {DAYS.map((d) => (
-              <th key={d} className="text-center font-semibold text-fg-muted pb-1.5 px-0.5">
-                {compact ? d.slice(0, 1) : d}
+              <th key={d} className="text-center font-semibold text-fg-muted pb-1.5 px-0.5 whitespace-nowrap">
+                {dayLabels[d]}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {slots.map((slot) => (
-            <tr key={slot.id} className="border-t border-edge-muted">
-              <td className="pr-2 py-0.5 text-right text-fg-subtle align-middle whitespace-nowrap">
-                <span className="text-[10px]">{compact ? slot.label : slot.range}</span>
-              </td>
-              {DAYS.map((day) => {
-                const key = `${day}:${slot.id}`
-                const cell = scheduleMap[key]
-                return (
-                  <td key={day} className="p-0.5 align-middle">
-                    {cell ? (
-                      <button
-                        onClick={() => onRemove(key)}
-                        title={`${cell.subject_name}\n${cell.teacher_name}\nClique para remover`}
-                        className={`w-full ${SUBJECT_COLORS[cell.colorIdx].bg} text-white rounded-md
-                          px-1 py-1.5 text-center hover:opacity-70 transition-opacity`}
-                      >
-                        <p className="font-bold leading-none text-[10px]">{cell.subject_code}</p>
-                        {!compact && (
-                          <p className="leading-none mt-0.5 text-[9px] opacity-80 truncate">
-                            {cell.teacher_name.split(' ')[0]}
-                          </p>
-                        )}
-                      </button>
-                    ) : (
-                      <div className={`rounded-md border border-transparent ${
-                        compact ? 'h-7' : 'h-9'
-                      } bg-surface-2 opacity-20`} />
-                    )}
+          {finalPeriods.map((period, pi) => (
+            <>
+              {/* Header de período */}
+              {!compact && (
+                <tr key={`h-${period.label}`}>
+                  <td colSpan={7}
+                    className="text-[9px] font-bold text-fg-subtle uppercase tracking-widest py-1.5 pt-3 text-left pr-2">
+                    {period.label}
                   </td>
-                )
-              })}
-            </tr>
+                </tr>
+              )}
+              {period.slots.map((slot) => (
+                <tr key={slot.id} className="border-t border-edge-muted">
+                  <td className="pr-2 py-0.5 text-right text-fg-subtle align-middle whitespace-nowrap">
+                    <span>{compact ? slot.label : slot.range}</span>
+                  </td>
+                  {DAYS.map((day) => {
+                    const key = `${day}:${slot.id}`
+                    const cell = scheduleMap[key]
+                    return (
+                      <td key={day} className="p-0.5 align-middle">
+                        {cell ? (
+                          <button
+                            onClick={() => onRemove(key)}
+                            title={`${cell.subject_name}\n${cell.teacher_name}\nClique para remover`}
+                            className={`w-full ${SUBJECT_COLORS[cell.colorIdx].bg} text-white rounded-md
+                              px-1 py-1.5 text-center hover:opacity-70 transition-opacity`}>
+                            <p className="font-bold leading-none" style={{ fontSize: compact ? 9 : 10 }}>
+                              {cell.subject_code}
+                            </p>
+                            {!compact && (
+                              <p className="leading-none mt-0.5 opacity-80 truncate" style={{ fontSize: 9 }}>
+                                {cell.teacher_name.split(' ')[0]}
+                              </p>
+                            )}
+                          </button>
+                        ) : (
+                          <div className={`rounded-md border border-transparent ${compact ? 'h-6' : 'h-8'} bg-surface-2 opacity-20`} />
+                        )}
+                      </td>
+                    )
+                  })}
+                </tr>
+              ))}
+            </>
           ))}
         </tbody>
       </table>

@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { StarRating } from '@/components/ui/StarRating'
 import {
-  ScheduleGrid, SUBJECT_COLORS, DAYS, MORNING_SLOTS, NIGHT_SLOTS,
+  ScheduleGrid, SUBJECT_COLORS, DAYS, ALL_SLOTS, PERIODS,
   type ScheduleMap, type ScheduleSlot,
 } from './ScheduleGrid'
 
@@ -32,8 +32,8 @@ type ColorMap = Record<string, number>
 
 // Configuração de horários selecionados por disciplina
 type SlotConfig = {
-  days: string[]    // ['SEG', 'QUA']
-  slotId: number    // 0-4
+  days: string[]    // ['SEG', 'QUA', 'SAB']
+  slotId: number    // 0-9 (ALL_SLOTS ids)
   numSlots: number  // quantos slots consecutivos (1–4)
 }
 type SlotConfigs = Record<string, SlotConfig> // subject_id → config
@@ -160,7 +160,6 @@ export function GradeBuilder() {
   const maxSemesters = COURSES.find((c) => c.code === course)?.semesters ?? 8
   const selectedVersion = versions.find((v) => v.id === selectedVersionId)
   const shift = selectedVersion?.shift ?? null
-  const timeSlots = shift?.toLowerCase() === 'noturno' ? NIGHT_SLOTS : MORNING_SLOTS
 
   useEffect(() => {
     async function load() {
@@ -218,7 +217,7 @@ export function GradeBuilder() {
     for (const day of config.days) {
       for (let i = 0; i < config.numSlots; i++) {
         const slotIdx = config.slotId + i
-        if (slotIdx < timeSlots.length) {
+        if (slotIdx < ALL_SLOTS.length) {
           scheduleMap[`${day}:${slotIdx}`] = entry
         }
       }
@@ -267,9 +266,9 @@ export function GradeBuilder() {
       <div className="hidden print:block p-6">
         <h1 className="text-xl font-bold mb-1">Minha Grade — {course}</h1>
         <p className="text-sm text-fg-muted mb-4">
-          {shift ?? 'Matutino'} · {activeSemesters.map((n) => `${n}º`).join(', ')} Semestre
+          {shift ?? ''}{shift ? ' · ' : ''}{activeSemesters.map((n) => `${n}º`).join(', ')} Semestre
         </p>
-        <ScheduleGrid scheduleMap={scheduleMap} shift={shift} onRemove={() => {}} compact />
+        <ScheduleGrid scheduleMap={scheduleMap} onRemove={() => {}} compact />
         <p className="text-[10px] text-fg-subtle text-right mt-4">
           MeuSemestreUCSAL · {new Date().toLocaleDateString('pt-BR')}
         </p>
@@ -411,7 +410,7 @@ export function GradeBuilder() {
                               <div className="flex items-center gap-2 flex-shrink-0">
                                 {isPlaced ? (
                                   <span className="text-xs text-brand-400 font-medium">
-                                    ✓ {config.days.join('/')} {timeSlots[config.slotId]?.label}
+                                    ✓ {config.days.join('/')} {ALL_SLOTS.find(s => s.id === config.slotId)?.label}
                                   </span>
                                 ) : null}
                                 <button
@@ -488,51 +487,59 @@ export function GradeBuilder() {
                                 Horário de <span className="text-fg">{slot.subject_code}</span> com {selTeacher.teacher_name.split(' ')[0]}
                               </p>
 
-                              {/* Dias da semana */}
+                              {/* Dias da semana (inclui Sáb) */}
                               <div>
                                 <p className="text-[11px] text-fg-subtle mb-1.5">Dias</p>
-                                <div className="flex gap-1.5">
+                                <div className="flex flex-wrap gap-1.5">
                                   {DAYS.map((day) => {
+                                    const dayLabels: Record<string, string> = { SEG:'Seg', TER:'Ter', QUA:'Qua', QUI:'Qui', SEX:'Sex', SAB:'Sáb' }
                                     const active = config?.days.includes(day) ?? false
                                     return (
                                       <button key={day} onClick={() => toggleDay(slot.subject_id, day)}
-                                        className={`w-10 h-9 rounded-lg border text-xs font-bold transition-all ${
+                                        className={`px-2.5 h-8 rounded-lg border text-xs font-bold transition-all ${
                                           active
                                             ? `${color.bg} text-white border-transparent`
                                             : 'border-edge text-fg-muted hover:border-fg-muted'
-                                        }`}>{day.slice(0, 3)}</button>
+                                        }`}>{dayLabels[day]}</button>
                                     )
                                   })}
                                 </div>
                               </div>
 
-                              {/* Horário de início */}
+                              {/* Horário de início — agrupado por período */}
                               <div>
                                 <p className="text-[11px] text-fg-subtle mb-1.5">Horário de início</p>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {timeSlots.map((ts) => {
-                                    const active = (config?.slotId ?? -1) === ts.id
-                                    return (
-                                      <button key={ts.id} onClick={() => updateSlotConfig(slot.subject_id, { slotId: ts.id })}
-                                        className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
-                                          active
-                                            ? `${color.bg} text-white border-transparent`
-                                            : 'border-edge text-fg-muted hover:border-fg-muted'
-                                        }`}>{ts.label}</button>
-                                    )
-                                  })}
+                                <div className="space-y-2">
+                                  {PERIODS.map((period) => (
+                                    <div key={period.label}>
+                                      <p className="text-[10px] text-fg-subtle mb-1">{period.label}</p>
+                                      <div className="flex flex-wrap gap-1.5">
+                                        {period.slots.map((ts) => {
+                                          const active = (config?.slotId ?? -1) === ts.id
+                                          return (
+                                            <button key={ts.id} onClick={() => updateSlotConfig(slot.subject_id, { slotId: ts.id })}
+                                              className={`px-2.5 py-1 rounded-lg border text-xs font-medium transition-all ${
+                                                active
+                                                  ? `${color.bg} text-white border-transparent`
+                                                  : 'border-edge text-fg-muted hover:border-fg-muted'
+                                              }`}>{ts.label}</button>
+                                          )
+                                        })}
+                                      </div>
+                                    </div>
+                                  ))}
                                 </div>
                               </div>
 
                               {/* Duração */}
                               <div>
                                 <p className="text-[11px] text-fg-subtle mb-1.5">Duração por dia</p>
-                                <div className="flex gap-1.5">
+                                <div className="flex flex-wrap gap-1.5">
                                   {[
-                                    { v: 1, label: '1 aula (50 min)' },
-                                    { v: 2, label: '2 aulas (100 min)' },
-                                    { v: 3, label: '3 aulas (150 min)' },
-                                    { v: 4, label: '4 aulas (200 min)' },
+                                    { v: 1, label: '1 aula (75 min)' },
+                                    { v: 2, label: '2 aulas (2h30)' },
+                                    { v: 3, label: '3 aulas (3h45)' },
+                                    { v: 4, label: '4 aulas (5h)' },
                                   ].map(({ v, label }) => {
                                     const active = (config?.numSlots ?? 1) === v
                                     return (
@@ -575,12 +582,11 @@ export function GradeBuilder() {
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-sm font-semibold text-fg">Grade semanal</h2>
                 <span className="text-xs text-fg-subtle">
-                  {shift ? (shift.charAt(0).toUpperCase() + shift.slice(1).toLowerCase()) : 'Matutino'}
+                  {shift ?? 'Todos os turnos'}
                 </span>
               </div>
               <ScheduleGrid
                 scheduleMap={scheduleMap}
-                shift={shift}
                 onRemove={(key) => {
                   const cell = scheduleMap[key]
                   if (cell) setSlotConfigs((p) => { const n = { ...p }; delete n[cell.subject_id]; return n })
