@@ -1,5 +1,7 @@
 'use client'
 
+'use client'
+
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
@@ -8,6 +10,7 @@ import {
   ScheduleGrid, SUBJECT_COLORS, DAYS, ALL_SLOTS, PERIODS,
   type ScheduleMap, type ScheduleSlot,
 } from './ScheduleGrid'
+import { saveGrade } from '@/lib/actions/grade'
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -157,6 +160,12 @@ export function GradeBuilder() {
   const [loading, setLoading] = useState(false)
   const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null)
   const [showSummary, setShowSummary] = useState(false)
+  const [saveName, setSaveName] = useState('Minha grade')
+  const [saving, setSaving] = useState(false)
+  const [savedMsg, setSavedMsg] = useState<string | null>(null)
+  // Cache de exibição independente do fetch — evita grade sumir ao trocar semestres
+  const [displayCache, setDisplayCache] = useState<Record<string, { subject_name: string; subject_code: string; teacher_name: string; colorIdx: number }>>({})
+
 
   const maxSemesters = COURSES.find((c) => c.code === course)?.semesters ?? 8
   const selectedVersion = versions.find((v) => v.id === selectedVersionId)
@@ -181,6 +190,7 @@ export function GradeBuilder() {
     setSelections({})
     setColorMap({})
     setSlotConfigs({})
+    setDisplayCache({})
     setExpandedSchedule(null)
   }, [course])
 
@@ -204,16 +214,18 @@ export function GradeBuilder() {
       .finally(() => setLoading(false))
   }, [selectedVersionId, activeSemesters])
 
-  // Constrói o ScheduleMap a partir das SlotConfigs
+  // Constrói o ScheduleMap usando displayCache (não depende de slots — grade não some ao trocar semestre)
   const scheduleMap: ScheduleMap = {}
   for (const [subject_id, config] of Object.entries(slotConfigs)) {
-    const slot = slots.find((s) => s.subject_id === subject_id)
-    const teacher = slot?.teachers.find((t) => t.teacher_id === selections[subject_id])
-    if (!slot || !teacher) continue
-    const colorIdx = colorMap[subject_id] ?? 0
+    if (!config.days.length) continue
+    const cached = displayCache[subject_id]
+    if (!cached) continue
     const entry: ScheduleSlot = {
-      subject_id, subject_name: slot.subject_name,
-      subject_code: slot.subject_code, teacher_name: teacher.teacher_name, colorIdx,
+      subject_id,
+      subject_name: cached.subject_name,
+      subject_code: cached.subject_code,
+      teacher_name: cached.teacher_name,
+      colorIdx: cached.colorIdx,
     }
     for (const day of config.days) {
       for (let i = 0; i < config.numSlots; i++) {
@@ -233,14 +245,31 @@ export function GradeBuilder() {
     setSelections((p) => ({ ...p, [subject_id]: teacher_id }))
     if (!teacher_id) {
       setSlotConfigs((p) => { const n = { ...p }; delete n[subject_id]; return n })
+      setDisplayCache((p) => { const n = { ...p }; delete n[subject_id]; return n })
       if (expandedSchedule === subject_id) setExpandedSchedule(null)
+    } else {
+      // Salva dados de exibição no cache agora que temos os dados em `slots`
+      const slot = slots.find((s) => s.subject_id === subject_id)
+      const teacher = slot?.teachers.find((t) => t.teacher_id === teacher_id)
+      if (slot && teacher) {
+        const colorIdx = colorMap[subject_id] ?? 0
+        setDisplayCache((p) => ({
+          ...p,
+          [subject_id]: {
+            subject_name: slot.subject_name,
+            subject_code: slot.subject_code,
+            teacher_name: teacher.teacher_name,
+            colorIdx,
+          },
+        }))
+      }
     }
   }
 
   function updateSlotConfig(subject_id: string, patch: Partial<SlotConfig>) {
     setSlotConfigs((p) => ({
       ...p,
-      [subject_id]: { days: [], slotId: 0, numSlots: 1, ...p[subject_id], ...patch },
+      [subject_id]: { ...({ days: [] as string[], slotId: 0, numSlots: 1 }), ...p[subject_id], ...patch },
     }))
   }
 
@@ -251,6 +280,32 @@ export function GradeBuilder() {
   }
 
   function handlePrint() { window.print() }
+
+  async function handleSave() {
+    setSaving(true)
+    setSavedMsg(null)
+    const items = slots
+      .filter((s) => selections[s.subject_id] && slotConfigs[s.subject_id]?.days.length > 0)
+      .map((s) => {
+        const cfg = slotConfigs[s.subject_id]
+        const cached = displayCache[s.subject_id]
+        return {
+          subject_id: s.subject_id,
+          teacher_id: selections[s.subject_id]!,
+          subject_code: cached?.subject_code ?? s.subject_code,
+          subject_name: cached?.subject_name ?? s.subject_name,
+          teacher_name: cached?.teacher_name ?? '',
+          days: cfg.days,
+          slotId: cfg.slotId,
+          numSlots: cfg.numSlots,
+          colorIdx: cached?.colorIdx ?? 0,
+        }
+      })
+    const result = await saveGrade(saveName, course, activeSemesters, items)
+    setSaving(false)
+    if ('error' in result) setSavedMsg('Erro ao salvar. Tente novamente.')
+    else setSavedMsg('Grade salva! Acesse em /perfil.')
+  }
 
   const score = calcScore(slots, selections)
   const selectedCount = Object.values(selections).filter(Boolean).length
@@ -713,19 +768,39 @@ export function GradeBuilder() {
               </div>
 
               {/* Rodapé */}
-              <div className="px-6 pb-6 flex gap-3">
-                <button onClick={handlePrint}
-                  className="flex-1 py-2.5 bg-surface border border-edge rounded-xl text-sm font-semibold text-fg-muted hover:border-fg-muted hover:text-fg transition-all flex items-center justify-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                  </svg>
-                  Imprimir
-                </button>
-                <button onClick={() => setShowSummary(false)}
-                  className="flex-1 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-bold hover:bg-brand-700 transition-colors">
-                  Continuar editando
-                </button>
+              <div className="px-6 pb-6 space-y-3">
+                {/* Salvar grade */}
+                <div className="flex gap-2">
+                  <input
+                    value={saveName}
+                    onChange={(e) => setSaveName(e.target.value)}
+                    placeholder="Nome da grade..."
+                    className="flex-1 px-3 py-2 bg-canvas border border-edge rounded-xl text-sm text-fg placeholder:text-fg-subtle focus:outline-none focus:ring-1 focus:ring-brand-400 focus:border-brand-400"
+                  />
+                  <button onClick={handleSave} disabled={saving}
+                    className="px-4 py-2 bg-accent-500 text-white text-sm font-bold rounded-xl hover:bg-accent-600 transition-colors disabled:opacity-50 whitespace-nowrap">
+                    {saving ? 'Salvando...' : '💾 Salvar'}
+                  </button>
+                </div>
+                {savedMsg && (
+                  <p className={`text-xs px-3 py-2 rounded-lg border ${savedMsg.startsWith('Erro') ? 'bg-[#2d0a0a] border-red-700 text-red-400' : 'bg-brand-100 border-brand-300 text-brand-400'}`}>
+                    {savedMsg}
+                  </p>
+                )}
+                <div className="flex gap-3">
+                  <button onClick={handlePrint}
+                    className="flex-1 py-2.5 bg-surface border border-edge rounded-xl text-sm font-semibold text-fg-muted hover:border-fg-muted hover:text-fg transition-all flex items-center justify-center gap-2">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                    </svg>
+                    Imprimir
+                  </button>
+                  <button onClick={() => setShowSummary(false)}
+                    className="flex-1 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-bold hover:bg-brand-700 transition-colors">
+                    Continuar editando
+                  </button>
+                </div>
               </div>
             </div>
           </div>
