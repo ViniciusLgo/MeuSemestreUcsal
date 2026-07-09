@@ -26,6 +26,13 @@ function LoginForm() {
 
   const supabase = createClient()
 
+  // Restaura estado ao voltar do app de email (celular recarrega a página)
+  useEffect(() => {
+    const saved = sessionStorage.getItem('otp_email')
+    if (saved) { setEmail(saved); setStep('otp') }
+  }, [])
+
+
   async function handleSendOtp(e: React.FormEvent) {
     e.preventDefault()
     const trimmed = email.trim()
@@ -44,6 +51,7 @@ function LoginForm() {
       setError(`Erro ${err.status ?? ''}: ${err.message || JSON.stringify(err)}`)
       return
     }
+    sessionStorage.setItem('otp_email', trimmed)
     setStep('otp')
   }
 
@@ -66,6 +74,7 @@ function LoginForm() {
       setError('Código inválido ou expirado. Solicite um novo código.')
       return
     }
+    sessionStorage.removeItem('otp_email')
     // Verifica se o perfil tem curso configurado
     const profileRes = await (supabase as any)
       .from('profiles')
@@ -162,7 +171,7 @@ function LoginForm() {
 
             <button
               type="button"
-              onClick={() => { setStep('email'); setOtp(''); setError(null) }}
+              onClick={() => { setStep('email'); setOtp(''); setError(null); sessionStorage.removeItem('otp_email') }}
               className="w-full text-sm text-fg-subtle hover:text-fg-muted transition-colors"
             >
               Usar outro email
