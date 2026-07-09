@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { saveProfile } from '@/lib/actions/student'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 
@@ -57,25 +58,11 @@ function ConfigurarForm() {
     setSaving(true)
     setError(null)
 
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      router.push('/entrar')
-      return
-    }
-
-    const selectedVersion = versions.find((v) => v.id === selectedVersionId)
-
-    const { error: err } = await (supabase as any)
-      .from('profiles')
-      .update({
-        course_id: selectedCourseId,
-        shift: selectedVersion?.shift ?? null,
-        curriculum_version_id: selectedVersionId,
-      })
-      .eq('id', user.id)
+    const selectedCourse = courses.find((c) => c.id === selectedCourseId)
+    const result = await saveProfile(selectedCourseId, selectedVersionId, selectedCourse?.code ?? '')
 
     setSaving(false)
-    if (err) {
+    if (result.error) {
       setError('Erro ao salvar. Tente novamente.')
       return
     }
