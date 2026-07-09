@@ -216,9 +216,8 @@ export default async function SubjectPage({ params }: Props) {
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {review.would_recommend && <Badge variant="success">✓ Recomenda</Badge>}
-                    {review.is_easy_to_pass === 'sim' && <Badge variant="success">Fácil de passar</Badge>}
-                    {review.is_easy_to_pass === 'mais_ou_menos' && <Badge variant="default">Mais ou menos</Badge>}
-                    {review.is_easy_to_pass === 'nao' && <Badge variant="warning">Difícil de passar</Badge>}
+                    {review.is_easy_to_pass === true && <Badge variant="success">Fácil de passar</Badge>}
+                    {review.is_easy_to_pass === false && <Badge variant="warning">Difícil de passar</Badge>}
                     {review.teacher_is_engaging === true && <Badge variant="info">Professor engajado</Badge>}
                     {review.teacher_is_engaging === false && <Badge variant="warning">Professor enrolado</Badge>}
                     {review.attendance_pressure && (

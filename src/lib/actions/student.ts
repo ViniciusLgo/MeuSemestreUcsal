@@ -75,7 +75,7 @@ type ReviewPayload = {
   would_recommend: boolean
   teacher_absence: string | null
   teacher_is_engaging: boolean | null
-  is_easy_to_pass: 'sim' | 'mais_ou_menos' | 'nao' | null
+  is_easy_to_pass: boolean | null
   attendance_pressure: string | null
   assessment_style: string | null
   exam_types: string[] | null
