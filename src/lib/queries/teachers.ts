@@ -108,9 +108,9 @@ export async function getAllTeachers(): Promise<TeacherSummary[]> {
     supabase.from('teacher_subjects').select('teacher_id').eq('active', true),
   ])
 
-  const teachers = teachersRes.data ?? []
-  const reviews = reviewsRes.data ?? []
-  const subjects = subjectsRes.data ?? []
+  const teachers = (teachersRes.data ?? []) as Array<{ id: string; name: string; slug: string }>
+  const reviews = (reviewsRes.data ?? []) as Array<{ teacher_id: string; rating_general: number }>
+  const subjects = (subjectsRes.data ?? []) as Array<{ teacher_id: string }>
 
   const reviewMap = new Map<string, number[]>()
   for (const r of reviews) {
