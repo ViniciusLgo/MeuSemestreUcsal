@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 
 type Subject = { id: string; code: string; name: string; type: string }
 
@@ -18,6 +19,7 @@ const TYPE_LABEL: Record<string, string> = {
 }
 
 export function SubjectSelector({ teacherId, subjects, action, courses }: Props) {
+  const router = useRouter()
   const [filter, setFilter] = useState('')
   const [selected, setSelected] = useState<Set<string>>(new Set())
   const [pending, setPending] = useState(false)
@@ -54,6 +56,7 @@ export function SubjectSelector({ teacherId, subjects, action, courses }: Props)
     await action(fd)
     setSelected(new Set())
     setPending(false)
+    router.refresh()
   }
 
   return (
