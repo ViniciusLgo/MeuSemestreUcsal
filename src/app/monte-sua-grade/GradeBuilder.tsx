@@ -582,12 +582,12 @@ export function GradeBuilder() {
                                       {teacher.review_count > 0 && (
                                         <button
                                           onClick={() => setExpandedTeacher(isInfoOpen ? null : infoKey)}
-                                          className={`mr-3 px-2 py-1 rounded-lg border text-[10px] font-bold transition-all flex-shrink-0 ${
+                                          className={`mr-3 px-3 py-1.5 rounded-xl border text-xs font-bold transition-all flex-shrink-0 flex items-center gap-1 ${
                                             isInfoOpen
-                                              ? 'bg-accent-500 border-accent-500 text-white'
-                                              : 'border-edge text-fg-subtle hover:border-accent-400 hover:text-accent-400'
+                                              ? 'bg-accent-500 border-accent-500 text-white shadow-sm'
+                                              : 'bg-accent-100 border-accent-400 text-accent-400 hover:bg-accent-500 hover:text-white'
                                           }`}>
-                                          {isInfoOpen ? '▲' : '+ info'}
+                                          {isInfoOpen ? '▲ fechar' : 'ℹ info'}
                                         </button>
                                       )}
                                     </div>
