@@ -96,6 +96,13 @@ type ReviewRow = {
   comment: string | null
   had_in_person_event: boolean | null
   relevant_to_course: boolean | null
+  // Novos campos v2
+  teacher_absence: 'nunca' | 'raramente' | 'frequente' | null
+  is_easy_to_pass: boolean | null
+  teacher_is_engaging: boolean | null
+  exam_types: string[] | null
+  has_assignments: boolean | null
+  has_activities: boolean | null
   status: 'publicada' | 'oculta' | 'em_revisao'
   created_at: string
   updated_at: string
