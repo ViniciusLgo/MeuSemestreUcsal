@@ -90,6 +90,53 @@ export async function getReviewsByTeacher(teacherId: string): Promise<ReviewByTe
   return (data ?? []) as ReviewByTeacher[]
 }
 
+export type TeacherSummary = {
+  id: string
+  name: string
+  slug: string
+  review_count: number
+  avg_general: number | null
+  subject_count: number
+}
+
+export async function getAllTeachers(): Promise<TeacherSummary[]> {
+  const supabase = await createClient()
+
+  const [teachersRes, reviewsRes, subjectsRes] = await Promise.all([
+    supabase.from('teachers').select('id, name, slug').eq('active', true).order('name'),
+    supabase.from('reviews').select('teacher_id, rating_general').eq('status', 'publicada'),
+    supabase.from('teacher_subjects').select('teacher_id').eq('active', true),
+  ])
+
+  const teachers = teachersRes.data ?? []
+  const reviews = reviewsRes.data ?? []
+  const subjects = subjectsRes.data ?? []
+
+  const reviewMap = new Map<string, number[]>()
+  for (const r of reviews) {
+    const arr = reviewMap.get(r.teacher_id) ?? []
+    arr.push(r.rating_general)
+    reviewMap.set(r.teacher_id, arr)
+  }
+
+  const subjectMap = new Map<string, number>()
+  for (const s of subjects) {
+    subjectMap.set(s.teacher_id, (subjectMap.get(s.teacher_id) ?? 0) + 1)
+  }
+
+  return teachers.map((t) => {
+    const ratings = reviewMap.get(t.id) ?? []
+    return {
+      id: t.id,
+      name: t.name,
+      slug: t.slug,
+      review_count: ratings.length,
+      avg_general: ratings.length ? ratings.reduce((a, b) => a + b, 0) / ratings.length : null,
+      subject_count: subjectMap.get(t.id) ?? 0,
+    }
+  })
+}
+
 export function buildSubjectStats(reviews: ReviewByTeacher[]): SubjectStats[] {
   const map = new Map<string, { name: string; code: string; reviews: ReviewByTeacher[] }>()
   for (const r of reviews) {
