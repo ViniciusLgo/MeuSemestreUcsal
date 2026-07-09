@@ -33,6 +33,12 @@ export async function Header() {
             ADS
           </Link>
           <Link
+            href="/professores"
+            className="px-3 py-2 text-fg-muted hover:text-fg hover:bg-surface-2 rounded-lg transition-colors"
+          >
+            Professores
+          </Link>
+          <Link
             href="/buscar"
             className="px-3 py-2 text-fg-muted hover:text-fg hover:bg-surface-2 rounded-lg transition-colors"
           >
