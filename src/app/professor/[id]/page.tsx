@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import {
-  getTeacherById, getReviewsByTeacher, buildSubjectStats,
-  type ReviewByTeacher, type SubjectStats,
+  getTeacherById, getReviewsByTeacher, getSubjectsByTeacher, buildSubjectStats,
+  type ReviewByTeacher, type SubjectStats, type SubjectBasic,
 } from '@/lib/queries/teachers'
 import { Avatar } from '@/components/ui/Avatar'
 import { Badge } from '@/components/ui/Badge'
@@ -44,9 +44,10 @@ const examTypeLabel: Record<string, string> = {
 
 export default async function TeacherPage({ params }: Props) {
   const { id } = await params
-  const [teacher, reviews] = await Promise.all([
+  const [teacher, reviews, linkedSubjects] = await Promise.all([
     getTeacherById(id),
     getReviewsByTeacher(id),
+    getSubjectsByTeacher(id),
   ])
   if (!teacher) notFound()
 
@@ -126,46 +127,64 @@ export default async function TeacherPage({ params }: Props) {
       )}
 
       {/* ── Por disciplina ────────────────────────────────────────────── */}
-      {subjectStats.length > 0 && (
+      {linkedSubjects.length > 0 && (
         <div className="mb-10">
-          <h2 className="text-xl font-bold text-fg mb-4">Notas por disciplina</h2>
+          <h2 className="text-xl font-bold text-fg mb-4">
+            Disciplinas
+            <span className="ml-2 text-sm font-normal text-fg-subtle">{linkedSubjects.length}</span>
+          </h2>
           <div className="grid sm:grid-cols-2 gap-3">
-            {subjectStats.map((s: SubjectStats) => (
-              <Link key={s.subject_id} href={`/disciplina/${s.subject_id}`}>
-                <div className="bg-surface border border-edge rounded-2xl p-4 hover:border-brand-400 hover:shadow-sm transition-all">
-                  <div className="flex items-center justify-between gap-3 mb-3">
-                    <div className="min-w-0">
-                      <p className="text-xs font-mono text-fg-subtle">{s.subject_code}</p>
-                      <p className="text-sm font-semibold text-fg leading-tight">{s.subject_name}</p>
-                      <p className="text-xs text-fg-subtle mt-0.5">{s.review_count} avaliação{s.review_count !== 1 ? 'ões' : ''}</p>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <p className={`text-2xl font-bold tabular-nums ${ratingColor(s.avg_general)}`}>{s.avg_general.toFixed(1)}</p>
-                      <StarRating value={s.avg_general} size="sm" />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {[
-                      { label: 'Didática', value: s.avg_didactics },
-                      { label: 'Organização', value: s.avg_organization },
-                      { label: 'Carga', value: s.avg_workload },
-                      { label: 'Dificuldade', value: s.avg_difficulty },
-                    ].map((m) => (
-                      <div key={m.label} className="bg-surface-2 rounded-lg px-2 py-1.5 flex items-center justify-between">
-                        <span className="text-[11px] text-fg-subtle">{m.label}</span>
-                        <span className={`text-xs font-bold tabular-nums ${ratingColor(m.value)}`}>{m.value.toFixed(1)}</span>
+            {linkedSubjects.map((sub: SubjectBasic) => {
+              const stats = subjectStats.find((s) => s.subject_id === sub.id)
+              return (
+                <Link key={sub.id} href={`/disciplina/${sub.id}`}>
+                  {stats ? (
+                    /* Com avaliações — card completo */
+                    <div className="bg-surface border border-edge rounded-2xl p-4 hover:border-brand-400 hover:shadow-sm transition-all">
+                      <div className="flex items-center justify-between gap-3 mb-3">
+                        <div className="min-w-0">
+                          <p className="text-xs font-mono text-fg-subtle">{stats.subject_code}</p>
+                          <p className="text-sm font-semibold text-fg leading-tight">{stats.subject_name}</p>
+                          <p className="text-xs text-fg-subtle mt-0.5">{stats.review_count} avaliação{stats.review_count !== 1 ? 'ões' : ''}</p>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <p className={`text-2xl font-bold tabular-nums ${ratingColor(stats.avg_general, 10)}`}>{stats.avg_general.toFixed(1)}</p>
+                          <StarRating value={stats.avg_general} max={10} size="sm" />
+                        </div>
                       </div>
-                    ))}
-                  </div>
-                  <div className="mt-2.5 pt-2 border-t border-edge-muted">
-                    <span className={`text-xs font-semibold ${s.would_recommend_pct >= 70 ? 'text-brand-400' : s.would_recommend_pct >= 40 ? 'text-amber-400' : 'text-red-400'}`}>
-                      {s.would_recommend_pct}%
-                    </span>
-                    <span className="text-xs text-fg-subtle ml-1">recomendariam</span>
-                  </div>
-                </div>
-              </Link>
-            ))}
+                      <div className="grid grid-cols-2 gap-1.5">
+                        {[
+                          { label: 'Didática', value: stats.avg_didactics },
+                          { label: 'Organização', value: stats.avg_organization },
+                          { label: 'Carga', value: stats.avg_workload },
+                          { label: 'Dificuldade', value: stats.avg_difficulty },
+                        ].map((m) => (
+                          <div key={m.label} className="bg-surface-2 rounded-lg px-2 py-1.5 flex items-center justify-between">
+                            <span className="text-[11px] text-fg-subtle">{m.label}</span>
+                            <span className={`text-xs font-bold tabular-nums ${ratingColor(m.value)}`}>{m.value.toFixed(1)}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-2.5 pt-2 border-t border-edge-muted">
+                        <span className={`text-xs font-semibold ${stats.would_recommend_pct >= 70 ? 'text-brand-400' : stats.would_recommend_pct >= 40 ? 'text-amber-400' : 'text-red-400'}`}>
+                          {stats.would_recommend_pct}%
+                        </span>
+                        <span className="text-xs text-fg-subtle ml-1">recomendariam</span>
+                      </div>
+                    </div>
+                  ) : (
+                    /* Sem avaliações — card simples */
+                    <div className="bg-surface border border-edge rounded-2xl p-4 hover:border-brand-400 hover:shadow-sm transition-all flex items-center justify-between gap-3 min-h-[72px]">
+                      <div className="min-w-0">
+                        <p className="text-xs font-mono text-fg-subtle">{sub.code}</p>
+                        <p className="text-sm font-semibold text-fg leading-tight">{sub.name}</p>
+                      </div>
+                      <span className="text-xs text-fg-subtle flex-shrink-0">Sem avaliações</span>
+                    </div>
+                  )}
+                </Link>
+              )
+            })}
           </div>
         </div>
       )}
