@@ -26,7 +26,25 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const { pathname } = request.nextUrl
+
+  // Protege rotas que exigem login
+  const protectedPaths = ['/avaliar', '/perfil', '/painel-interno']
+  const isProtected = protectedPaths.some((p) => pathname.startsWith(p))
+
+  if (isProtected && !user) {
+    const url = new URL('/entrar', request.url)
+    url.searchParams.set('redirectTo', pathname)
+    return NextResponse.redirect(url)
+  }
+
+  // Redireciona usuário logado para fora da página de login
+  if (pathname === '/entrar' && user) {
+    return NextResponse.redirect(new URL('/', request.url))
+  }
+
   return supabaseResponse
 }
 
