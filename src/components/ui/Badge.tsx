@@ -7,7 +7,7 @@ interface BadgeProps {
 }
 
 const variants = {
-  default: 'bg-[#21262d] text-[#8b949e] border border-[#30363d]',
+  default: 'bg-surface-2 text-fg-muted border border-edge',
   success: 'bg-brand-100 text-brand-400 border border-brand-300',
   warning: 'bg-[#2d1f00] text-amber-400 border border-amber-700',
   info: 'bg-accent-100 text-accent-400 border border-accent-300',

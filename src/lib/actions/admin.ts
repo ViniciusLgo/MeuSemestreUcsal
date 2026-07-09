@@ -24,15 +24,13 @@ function toSlug(name: string) {
 
 // ── Professores ──────────────────────────────────────────────
 
-export async function createTeacher(formData: FormData) {
+export async function createTeacher(formData: FormData): Promise<void> {
   const supabase = await requireAdmin()
-  const name = (formData.get('name') as string).trim()
-  if (!name) return { error: 'Nome obrigatório.' }
+  const name = (formData.get('name') as string)?.trim()
+  if (!name) return
 
   const slug = toSlug(name)
-  const { error } = await (supabase as any).from('teachers').insert({ name, slug })
-  if (error) return { error: error.code === '23505' ? 'Já existe um professor com esse nome.' : error.message }
-
+  await (supabase as any).from('teachers').insert({ name, slug })
   revalidatePath('/painel-interno/professores')
 }
 
@@ -42,13 +40,13 @@ export async function toggleTeacher(id: string, active: boolean) {
   revalidatePath('/painel-interno/professores')
 }
 
-export async function assignSubjects(formData: FormData) {
+export async function assignSubjects(formData: FormData): Promise<void> {
   const supabase = await requireAdmin()
   const teacher_id = formData.get('teacher_id') as string
   const subject_ids = formData.getAll('subject_ids') as string[]
   const course_id = (formData.get('course_id') as string) || null
 
-  if (!subject_ids.length) return { error: 'Selecione pelo menos uma disciplina.' }
+  if (!subject_ids.length) return
 
   const rows = subject_ids.map((subject_id) => ({ teacher_id, subject_id, course_id }))
   await (supabase as any)

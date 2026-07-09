@@ -33,8 +33,8 @@ export function CourseCards() {
   return (
     <section className="container-page py-16">
       <div className="text-center mb-10">
-        <h2 className="text-3xl font-bold text-[#e6edf3] mb-3">Escolha seu curso</h2>
-        <p className="text-[#8b949e] max-w-lg mx-auto">
+        <h2 className="text-3xl font-bold text-fg mb-3">Escolha seu curso</h2>
+        <p className="text-fg-muted max-w-lg mx-auto">
           Selecione o curso para explorar a matriz curricular, comparar professores e ler avaliações.
         </p>
       </div>
@@ -53,12 +53,12 @@ export function CourseCards() {
                 {course.type}
               </Badge>
 
-              <h3 className="text-xl font-bold text-[#e6edf3] mb-2 group-hover:text-[#3fb950] transition-colors">
+              <h3 className="text-xl font-bold text-fg mb-2 group-hover:text-brand-400 transition-colors">
                 {course.name}
               </h3>
-              <p className="text-sm text-[#8b949e] mb-5 leading-relaxed">{course.description}</p>
+              <p className="text-sm text-fg-muted mb-5 leading-relaxed">{course.description}</p>
 
-              <div className="flex items-center gap-4 text-xs text-[#6e7681] font-medium pt-4 border-t border-[#21262d]">
+              <div className="flex items-center gap-4 text-xs text-fg-subtle font-medium pt-4 border-t border-edge-muted">
                 <span>{course.semesters} semestres</span>
                 <span>{course.shift}</span>
                 <span>{course.subjects} disciplinas</span>

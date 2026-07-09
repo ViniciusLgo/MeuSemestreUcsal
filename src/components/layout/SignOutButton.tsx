@@ -16,7 +16,7 @@ export function SignOutButton({ className }: { className?: string }) {
   return (
     <button
       onClick={handleSignOut}
-      className={className ?? 'text-sm font-medium text-[#8b949e] hover:text-red-400 transition-colors px-3 py-2'}
+      className={className ?? 'text-sm font-medium text-fg-muted hover:text-red-400 transition-colors px-3 py-2'}
     >
       Sair
     </button>

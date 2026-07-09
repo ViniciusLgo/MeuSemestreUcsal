@@ -85,18 +85,18 @@ function ConfigurarForm() {
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-[#0d1117]">
-        <div className="text-[#8b949e] text-sm">Carregando...</div>
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-canvas">
+        <div className="text-fg-muted text-sm">Carregando...</div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 bg-[#0d1117]">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 bg-canvas">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-[#e6edf3]">Configure seu perfil</h1>
-          <p className="text-[#8b949e] text-sm mt-2">
+          <h1 className="text-2xl font-bold text-fg">Configure seu perfil</h1>
+          <p className="text-fg-muted text-sm mt-2">
             Isso nos ajuda a mostrar avaliações relevantes para você.
           </p>
         </div>
@@ -104,7 +104,7 @@ function ConfigurarForm() {
         <div className="space-y-6">
           {/* Seleção de curso */}
           <div>
-            <p className="text-sm font-semibold text-[#e6edf3] mb-3">Qual é o seu curso?</p>
+            <p className="text-sm font-semibold text-fg mb-3">Qual é o seu curso?</p>
             <div className="grid grid-cols-2 gap-3">
               {courses.map((course) => (
                 <button
@@ -119,18 +119,18 @@ function ConfigurarForm() {
                     'p-4 rounded-xl border-2 text-left transition-all',
                     selectedCourseId === course.id
                       ? 'border-brand-500 bg-brand-100'
-                      : 'border-[#30363d] bg-[#161b22] hover:border-[#8b949e]'
+                      : 'border-edge bg-surface hover:border-fg-muted'
                   )}
                 >
                   <div className={cn(
                     'text-lg font-bold mb-1',
-                    selectedCourseId === course.id ? 'text-brand-400' : 'text-[#e6edf3]'
+                    selectedCourseId === course.id ? 'text-brand-400' : 'text-fg'
                   )}>
                     {course.code}
                   </div>
                   <div className={cn(
                     'text-xs leading-tight',
-                    selectedCourseId === course.id ? 'text-brand-400' : 'text-[#8b949e]'
+                    selectedCourseId === course.id ? 'text-brand-400' : 'text-fg-muted'
                   )}>
                     {course.name}
                   </div>
@@ -142,7 +142,7 @@ function ConfigurarForm() {
           {/* Seleção de turno */}
           {selectedCourse && versions.length > 0 && (
             <div>
-              <p className="text-sm font-semibold text-[#e6edf3] mb-3">Qual é o seu turno?</p>
+              <p className="text-sm font-semibold text-fg mb-3">Qual é o seu turno?</p>
               <div className="grid grid-cols-2 gap-3">
                 {versions
                   .filter((v) => v.shift)
@@ -155,12 +155,12 @@ function ConfigurarForm() {
                         'p-4 rounded-xl border-2 text-left transition-all',
                         selectedVersionId === version.id
                           ? 'border-brand-500 bg-brand-100'
-                          : 'border-[#30363d] bg-[#161b22] hover:border-[#8b949e]'
+                          : 'border-edge bg-surface hover:border-fg-muted'
                       )}
                     >
                       <div className={cn(
                         'font-bold text-base',
-                        selectedVersionId === version.id ? 'text-brand-400' : 'text-[#e6edf3]'
+                        selectedVersionId === version.id ? 'text-brand-400' : 'text-fg'
                       )}>
                         {version.shift}
                       </div>
@@ -190,7 +190,7 @@ function ConfigurarForm() {
 
 export default function ConfigurarPerfilPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#0d1117]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-canvas" />}>
       <ConfigurarForm />
     </Suspense>
   )

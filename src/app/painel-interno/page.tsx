@@ -20,16 +20,16 @@ export default async function PainelPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-[#e6edf3] mb-8">Dashboard</h1>
+      <h1 className="text-2xl font-bold text-fg mb-8">Dashboard</h1>
       <div className="grid grid-cols-3 gap-5">
         {stats.map((s) => (
           <a
             key={s.label}
             href={s.href}
-            className="bg-[#161b22] rounded-2xl border border-[#30363d] p-6 hover:border-[#3fb950] transition-all"
+            className="bg-surface rounded-2xl border border-edge p-6 hover:border-brand-400 transition-all"
           >
-            <p className="text-3xl font-bold text-[#e6edf3] tabular-nums">{s.value}</p>
-            <p className="text-sm text-[#8b949e] mt-1">{s.label}</p>
+            <p className="text-3xl font-bold text-fg tabular-nums">{s.value}</p>
+            <p className="text-sm text-fg-muted mt-1">{s.label}</p>
           </a>
         ))}
       </div>

@@ -104,11 +104,11 @@ function FaqAccordion({ items }: { items: FaqItem[] }) {
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
-        <details key={i} className="group bg-[#161b22] border border-[#30363d] rounded-2xl overflow-hidden">
-          <summary className="flex items-center justify-between gap-4 px-6 py-4 cursor-pointer list-none select-none hover:bg-[#1c2128] transition-colors">
-            <span className="text-sm font-semibold text-[#e6edf3]">{item.q}</span>
+        <details key={i} className="group bg-surface border border-edge rounded-2xl overflow-hidden">
+          <summary className="flex items-center justify-between gap-4 px-6 py-4 cursor-pointer list-none select-none hover:bg-surface-hover transition-colors">
+            <span className="text-sm font-semibold text-fg">{item.q}</span>
             <svg
-              className="w-4 h-4 text-[#6e7681] flex-shrink-0 transition-transform group-open:rotate-180"
+              className="w-4 h-4 text-fg-subtle flex-shrink-0 transition-transform group-open:rotate-180"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -116,7 +116,7 @@ function FaqAccordion({ items }: { items: FaqItem[] }) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
           </summary>
-          <div className="px-6 pb-5 text-sm text-[#8b949e] leading-relaxed border-t border-[#21262d] pt-4">
+          <div className="px-6 pb-5 text-sm text-fg-muted leading-relaxed border-t border-edge-muted pt-4">
             {item.a}
           </div>
         </details>
@@ -131,22 +131,22 @@ export function FaqClient() {
   return (
     <div className="container-page py-12 max-w-2xl mx-auto">
       <div className="mb-8">
-        <Link href="/" className="text-sm text-[#6e7681] hover:text-[#3fb950] transition-colors">
+        <Link href="/" className="text-sm text-fg-subtle hover:text-brand-400 transition-colors">
           ← Início
         </Link>
-        <h1 className="text-3xl font-bold text-[#e6edf3] mt-4 mb-2">Perguntas frequentes</h1>
-        <p className="text-[#8b949e] text-sm">Dúvidas sobre a plataforma ou sobre a faculdade.</p>
+        <h1 className="text-3xl font-bold text-fg mt-4 mb-2">Perguntas frequentes</h1>
+        <p className="text-fg-muted text-sm">Dúvidas sobre a plataforma ou sobre a faculdade.</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-8 bg-[#161b22] border border-[#30363d] p-1 rounded-xl">
+      <div className="flex gap-2 mb-8 bg-surface border border-edge p-1 rounded-xl">
         <button
           onClick={() => setTab('plataforma')}
           className={cn(
             'flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all',
             tab === 'plataforma'
-              ? 'bg-[#21262d] text-[#e6edf3] border border-[#30363d]'
-              : 'text-[#6e7681] hover:text-[#8b949e]'
+              ? 'bg-surface-2 text-fg border border-edge'
+              : 'text-fg-subtle hover:text-fg-muted'
           )}
         >
           Sobre a plataforma
@@ -156,8 +156,8 @@ export function FaqClient() {
           className={cn(
             'flex-1 py-2.5 text-sm font-semibold rounded-lg transition-all',
             tab === 'ucsal'
-              ? 'bg-[#21262d] text-[#e6edf3] border border-[#30363d]'
-              : 'text-[#6e7681] hover:text-[#8b949e]'
+              ? 'bg-surface-2 text-fg border border-edge'
+              : 'text-fg-subtle hover:text-fg-muted'
           )}
         >
           Sobre a UCSAL

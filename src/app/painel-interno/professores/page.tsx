@@ -20,7 +20,7 @@ export default async function ProfessoresPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-2xl font-bold text-[#e6edf3]">Professores</h1>
+        <h1 className="text-2xl font-bold text-fg">Professores</h1>
       </div>
 
       {/* Formulário de cadastro */}
@@ -29,7 +29,7 @@ export default async function ProfessoresPage() {
           name="name"
           required
           placeholder="Nome completo do professor"
-          className="flex-1 px-4 py-2.5 bg-[#0d1117] border border-[#30363d] rounded-xl text-sm text-[#e6edf3] placeholder:text-[#6e7681] focus:outline-none focus:ring-1 focus:ring-[#58a6ff] focus:border-[#58a6ff] transition-colors"
+          className="flex-1 px-4 py-2.5 bg-canvas border border-edge rounded-xl text-sm text-fg placeholder:text-fg-subtle focus:outline-none focus:ring-1 focus:ring-accent-400 focus:border-accent-400 transition-colors"
         />
         <button
           type="submit"
@@ -40,9 +40,9 @@ export default async function ProfessoresPage() {
       </form>
 
       {/* Lista */}
-      <div className="bg-[#161b22] rounded-2xl border border-[#30363d] divide-y divide-[#21262d]">
+      <div className="bg-surface rounded-2xl border border-edge divide-y divide-edge-muted">
         {(teachers ?? []).length === 0 && (
-          <p className="px-6 py-8 text-center text-[#6e7681] text-sm">Nenhum professor cadastrado ainda.</p>
+          <p className="px-6 py-8 text-center text-fg-subtle text-sm">Nenhum professor cadastrado ainda.</p>
         )}
         {(teachers ?? []).map((t: any) => {
           const subjectCount: number = t.teacher_subjects?.length ?? 0
@@ -59,12 +59,12 @@ export default async function ProfessoresPage() {
                   <span className="text-brand-400 font-bold text-sm">{t.name[0]}</span>
                 </div>
                 <div className="min-w-0">
-                  <p className={`font-medium text-sm truncate ${t.active ? 'text-[#e6edf3]' : 'text-[#6e7681] line-through'}`}>
+                  <p className={`font-medium text-sm truncate ${t.active ? 'text-fg' : 'text-fg-subtle line-through'}`}>
                     {t.name}
                   </p>
                   <div className="flex items-center gap-3 mt-0.5 flex-wrap">
-                    <span className="text-xs text-[#6e7681]">{subjectCount} disciplina{subjectCount !== 1 ? 's' : ''}</span>
-                    <span className="text-xs text-[#6e7681]">{reviewCount} avaliação{reviewCount !== 1 ? 'ões' : ''}</span>
+                    <span className="text-xs text-fg-subtle">{subjectCount} disciplina{subjectCount !== 1 ? 's' : ''}</span>
+                    <span className="text-xs text-fg-subtle">{reviewCount} avaliação{reviewCount !== 1 ? 'ões' : ''}</span>
                     {avgRating && (
                       <span className="text-xs font-semibold text-amber-400">★ {avgRating}</span>
                     )}
@@ -76,13 +76,13 @@ export default async function ProfessoresPage() {
                 <Link
                   href={`/professor/${t.id}`}
                   target="_blank"
-                  className="text-xs font-medium text-[#6e7681] hover:text-[#8b949e]"
+                  className="text-xs font-medium text-fg-subtle hover:text-fg-muted"
                 >
                   Ver perfil ↗
                 </Link>
                 <Link
                   href={`/painel-interno/professores/${t.id}`}
-                  className="text-xs font-medium text-[#58a6ff] hover:text-accent-300"
+                  className="text-xs font-medium text-accent-400 hover:text-accent-300"
                 >
                   Disciplinas
                 </Link>
@@ -92,7 +92,7 @@ export default async function ProfessoresPage() {
                     className={`text-xs font-medium px-3 py-1 rounded-lg transition-colors ${
                       t.active
                         ? 'text-red-400 hover:bg-[#2d0a0a]'
-                        : 'text-[#3fb950] hover:bg-brand-100'
+                        : 'text-brand-400 hover:bg-brand-100'
                     }`}
                   >
                     {t.active ? 'Desativar' : 'Reativar'}

@@ -45,7 +45,7 @@ export function SearchBox() {
     <form onSubmit={handleSubmit} className="space-y-3">
       <div className="relative">
         <svg
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#6e7681] pointer-events-none"
+          className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-fg-subtle pointer-events-none"
           fill="none" stroke="currentColor" viewBox="0 0 24 24"
         >
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -56,18 +56,18 @@ export function SearchBox() {
           type="search"
           defaultValue={currentQ}
           placeholder="Buscar professor ou disciplina..."
-          className="w-full pl-12 pr-4 py-4 bg-[#0d1117] border border-[#30363d] rounded-2xl text-[#e6edf3] placeholder:text-[#6e7681] focus:outline-none focus:ring-1 focus:ring-[#58a6ff] focus:border-[#58a6ff] text-base transition-colors"
+          className="w-full pl-12 pr-4 py-4 bg-canvas border border-edge rounded-2xl text-fg placeholder:text-fg-subtle focus:outline-none focus:ring-1 focus:ring-accent-400 focus:border-accent-400 text-base transition-colors"
           autoFocus
         />
         {pending && (
-          <div className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-[#3fb950] border-t-transparent rounded-full animate-spin" />
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-brand-400 border-t-transparent rounded-full animate-spin" />
         )}
       </div>
 
       <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
         {/* Filtro por tipo */}
         <div className="flex items-center gap-1.5">
-          <span className="text-xs text-[#6e7681] font-medium">Mostrar:</span>
+          <span className="text-xs text-fg-subtle font-medium">Mostrar:</span>
           {TIPOS.map((t) => (
             <button
               key={t.value}
@@ -77,7 +77,7 @@ export function SearchBox() {
                 'px-3 py-1 rounded-full text-xs font-semibold border transition-all',
                 currentTipo === t.value
                   ? 'bg-brand-600 text-white border-brand-600'
-                  : 'bg-[#161b22] text-[#8b949e] border-[#30363d] hover:border-[#3fb950] hover:text-[#3fb950]'
+                  : 'bg-surface text-fg-muted border-edge hover:border-brand-400 hover:text-brand-400'
               )}
             >
               {t.label}
@@ -87,7 +87,7 @@ export function SearchBox() {
 
         {/* Filtro por curso */}
         <div className="flex items-center gap-1.5">
-          <span className="text-xs text-[#6e7681] font-medium">Curso:</span>
+          <span className="text-xs text-fg-subtle font-medium">Curso:</span>
           {CURSOS.map((c) => (
             <button
               key={c.value}
@@ -96,8 +96,8 @@ export function SearchBox() {
               className={cn(
                 'px-3 py-1 rounded-full text-xs font-semibold border transition-all',
                 currentCurso === c.value
-                  ? 'bg-[#21262d] text-[#e6edf3] border-[#8b949e]'
-                  : 'bg-[#161b22] text-[#8b949e] border-[#30363d] hover:border-[#8b949e] hover:text-[#e6edf3]'
+                  ? 'bg-surface-2 text-fg border-fg-muted'
+                  : 'bg-surface text-fg-muted border-edge hover:border-fg-muted hover:text-fg'
               )}
             >
               {c.label}

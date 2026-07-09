@@ -85,10 +85,10 @@ function LoginForm() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 bg-[#0d1117]">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 bg-canvas">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="w-14 h-14 rounded-2xl bg-[#161b22] border border-[#30363d] flex items-center justify-center mx-auto mb-5">
+          <div className="w-14 h-14 rounded-2xl bg-surface border border-edge flex items-center justify-center mx-auto mb-5">
             <svg width="28" height="28" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
               <line x1="8" y1="14" x2="28" y2="14" stroke="#238636" strokeWidth="2" strokeLinecap="round" />
               <line x1="8" y1="19" x2="28" y2="19" stroke="#238636" strokeWidth="2" strokeLinecap="round" strokeOpacity="0.6" />
@@ -97,10 +97,10 @@ function LoginForm() {
               <circle cx="26" cy="24" r="3" fill="#3fb950" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-[#e6edf3]">
+          <h1 className="text-2xl font-bold text-fg">
             {step === 'email' ? 'Entrar na plataforma' : 'Verificar código'}
           </h1>
-          <p className="text-[#8b949e] text-sm mt-2">
+          <p className="text-fg-muted text-sm mt-2">
             {step === 'email'
               ? 'Use seu email institucional UCSAL'
               : `Enviamos um código para ${email}`}
@@ -110,7 +110,7 @@ function LoginForm() {
         {step === 'email' ? (
           <form onSubmit={handleSendOtp} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-[#e6edf3] mb-1.5">
+              <label className="block text-sm font-medium text-fg mb-1.5">
                 Email institucional
               </label>
               <input
@@ -120,7 +120,7 @@ function LoginForm() {
                 placeholder="nome@ucsal.edu.br"
                 autoComplete="email"
                 required
-                className="w-full px-4 py-2.5 bg-[#0d1117] border border-[#30363d] rounded-xl text-[#e6edf3] placeholder:text-[#6e7681] focus:outline-none focus:ring-1 focus:ring-[#58a6ff] focus:border-[#58a6ff] text-sm transition-colors"
+                className="w-full px-4 py-2.5 bg-canvas border border-edge rounded-xl text-fg placeholder:text-fg-subtle focus:outline-none focus:ring-1 focus:ring-accent-400 focus:border-accent-400 text-sm transition-colors"
               />
             </div>
 
@@ -135,7 +135,7 @@ function LoginForm() {
         ) : (
           <form onSubmit={handleVerifyOtp} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-[#e6edf3] mb-1.5">
+              <label className="block text-sm font-medium text-fg mb-1.5">
                 Código de acesso
               </label>
               <input
@@ -148,7 +148,7 @@ function LoginForm() {
                 placeholder="00000000"
                 autoComplete="one-time-code"
                 autoFocus
-                className="w-full px-4 py-2.5 bg-[#0d1117] border border-[#30363d] rounded-xl text-[#e6edf3] placeholder:text-[#6e7681] focus:outline-none focus:ring-1 focus:ring-[#58a6ff] focus:border-[#58a6ff] text-sm text-center text-lg tracking-widest font-mono transition-colors"
+                className="w-full px-4 py-2.5 bg-canvas border border-edge rounded-xl text-fg placeholder:text-fg-subtle focus:outline-none focus:ring-1 focus:ring-accent-400 focus:border-accent-400 text-sm text-center text-lg tracking-widest font-mono transition-colors"
               />
             </div>
 
@@ -163,18 +163,18 @@ function LoginForm() {
             <button
               type="button"
               onClick={() => { setStep('email'); setOtp(''); setError(null) }}
-              className="w-full text-sm text-[#6e7681] hover:text-[#8b949e] transition-colors"
+              className="w-full text-sm text-fg-subtle hover:text-fg-muted transition-colors"
             >
               Usar outro email
             </button>
           </form>
         )}
 
-        <p className="text-center text-xs text-[#6e7681] mt-8">
+        <p className="text-center text-xs text-fg-subtle mt-8">
           Ao entrar, você concorda com os{' '}
-          <Link href="/termos" className="text-[#58a6ff] hover:text-accent-300 underline">termos de uso</Link>
+          <Link href="/termos" className="text-accent-400 hover:text-accent-300 underline">termos de uso</Link>
           {' '}e nossa{' '}
-          <Link href="/privacidade" className="text-[#58a6ff] hover:text-accent-300 underline">política de privacidade</Link>.
+          <Link href="/privacidade" className="text-accent-400 hover:text-accent-300 underline">política de privacidade</Link>.
         </p>
       </div>
     </div>
@@ -183,7 +183,7 @@ function LoginForm() {
 
 export default function EntrarPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#0d1117]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-canvas" />}>
       <LoginForm />
     </Suspense>
   )

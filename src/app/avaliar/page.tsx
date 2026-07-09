@@ -60,7 +60,7 @@ function StarPicker({
 
   return (
     <div>
-      <p className="text-sm font-medium text-[#e6edf3] mb-2">{label}</p>
+      <p className="text-sm font-medium text-fg mb-2">{label}</p>
       <div className="flex gap-1">
         {[1, 2, 3, 4, 5].map((n) => (
           <button
@@ -71,13 +71,13 @@ function StarPicker({
             onClick={() => onChange(n)}
             className="text-2xl transition-transform hover:scale-110"
           >
-            <span className={(hover || value) >= n ? 'text-amber-400' : 'text-[#30363d]'}>
+            <span className={(hover || value) >= n ? 'text-amber-400' : 'text-edge'}>
               ★
             </span>
           </button>
         ))}
         {value > 0 && (
-          <span className="ml-2 text-sm text-[#8b949e] self-center">{value}/5</span>
+          <span className="ml-2 text-sm text-fg-muted self-center">{value}/5</span>
         )}
       </div>
     </div>
@@ -97,7 +97,7 @@ function OptionPicker<T extends string>({
 }) {
   return (
     <div>
-      <p className="text-sm font-medium text-[#e6edf3] mb-2">{label}</p>
+      <p className="text-sm font-medium text-fg mb-2">{label}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((opt) => (
           <button
@@ -108,7 +108,7 @@ function OptionPicker<T extends string>({
               'px-3 py-1.5 rounded-full text-sm font-medium border transition-all',
               value === opt.value
                 ? 'bg-brand-600 text-white border-brand-600'
-                : 'bg-[#161b22] text-[#8b949e] border-[#30363d] hover:border-[#3fb950] hover:text-[#3fb950]'
+                : 'bg-surface text-fg-muted border-edge hover:border-brand-400 hover:text-brand-400'
             )}
           >
             {opt.label}
@@ -130,7 +130,7 @@ function BoolPicker({
 }) {
   return (
     <div>
-      <p className="text-sm font-medium text-[#e6edf3] mb-2">{label}</p>
+      <p className="text-sm font-medium text-fg mb-2">{label}</p>
       <div className="flex gap-2">
         {[
           { v: true, l: 'Sim' },
@@ -144,7 +144,7 @@ function BoolPicker({
               'px-4 py-1.5 rounded-full text-sm font-medium border transition-all',
               value === v
                 ? 'bg-brand-600 text-white border-brand-600'
-                : 'bg-[#161b22] text-[#8b949e] border-[#30363d] hover:border-[#3fb950] hover:text-[#3fb950]'
+                : 'bg-surface text-fg-muted border-edge hover:border-brand-400 hover:text-brand-400'
             )}
           >
             {l}
@@ -292,8 +292,8 @@ export default function AvaliarPage() {
     return (
       <div className="container-page py-20 text-center max-w-md mx-auto">
         <div className="text-5xl mb-5">🎉</div>
-        <h1 className="text-2xl font-bold text-[#e6edf3] mb-3">Avaliação enviada!</h1>
-        <p className="text-[#8b949e] mb-8">
+        <h1 className="text-2xl font-bold text-fg mb-3">Avaliação enviada!</h1>
+        <p className="text-fg-muted mb-8">
           Obrigado por contribuir com a comunidade UCSAL. Sua avaliação ajuda outros alunos.
         </p>
         <div className="flex flex-col gap-3">
@@ -307,7 +307,7 @@ export default function AvaliarPage() {
           )}
           <button
             onClick={() => { setForm(emptyForm); setStep(1); setSuccess(false) }}
-            className="text-sm text-[#6e7681] hover:text-[#8b949e] transition-colors"
+            className="text-sm text-fg-subtle hover:text-fg-muted transition-colors"
           >
             Avaliar outro professor
           </button>
@@ -318,8 +318,8 @@ export default function AvaliarPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-[#0d1117]">
-        <div className="text-[#8b949e] text-sm">Carregando...</div>
+      <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-canvas">
+        <div className="text-fg-muted text-sm">Carregando...</div>
       </div>
     )
   }
@@ -330,13 +330,13 @@ export default function AvaliarPage() {
     <div className="container-page py-10 max-w-2xl mx-auto">
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 mb-8 text-sm">
-        <Link href="/" className="text-[#6e7681] hover:text-[#3fb950] transition-colors">Início</Link>
-        <span className="text-[#30363d]">/</span>
-        <span className="text-[#8b949e]">Avaliar professor</span>
+        <Link href="/" className="text-fg-subtle hover:text-brand-400 transition-colors">Início</Link>
+        <span className="text-edge">/</span>
+        <span className="text-fg-muted">Avaliar professor</span>
       </div>
 
-      <h1 className="text-3xl font-bold text-[#e6edf3] mb-2">Avaliar professor</h1>
-      <p className="text-[#8b949e] text-sm mb-8">
+      <h1 className="text-3xl font-bold text-fg mb-2">Avaliar professor</h1>
+      <p className="text-fg-muted text-sm mb-8">
         Sua identidade nunca será revelada. Avalie com honestidade.
       </p>
 
@@ -354,14 +354,14 @@ export default function AvaliarPage() {
                 step > n
                   ? 'bg-brand-600 text-white'
                   : step === n
-                    ? 'bg-[#238636] text-white'
-                    : 'bg-[#21262d] text-[#6e7681]'
+                    ? 'bg-brand-600 text-white'
+                    : 'bg-surface-2 text-fg-subtle'
               )}>
                 {step > n ? '✓' : n}
               </div>
               <span className={cn(
                 'text-sm font-medium hidden sm:block',
-                step === n ? 'text-[#e6edf3]' : 'text-[#6e7681]'
+                step === n ? 'text-fg' : 'text-fg-subtle'
               )}>
                 {label}
               </span>
@@ -369,7 +369,7 @@ export default function AvaliarPage() {
             {i < arr.length - 1 && (
               <div className={cn(
                 'h-px w-8 flex-shrink-0',
-                step > n ? 'bg-brand-600' : 'bg-[#30363d]'
+                step > n ? 'bg-brand-600' : 'bg-overlay'
               )} />
             )}
           </div>
@@ -380,18 +380,18 @@ export default function AvaliarPage() {
       {step === 1 && (
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-semibold text-[#e6edf3] mb-2">
+            <label className="block text-sm font-semibold text-fg mb-2">
               Professor
             </label>
             {teachers.length === 0 ? (
-              <p className="text-sm text-[#8b949e] bg-[#161b22] border border-[#30363d] px-4 py-3 rounded-xl">
+              <p className="text-sm text-fg-muted bg-surface border border-edge px-4 py-3 rounded-xl">
                 Nenhum professor cadastrado ainda.
               </p>
             ) : (
               <select
                 value={form.teacher_id}
                 onChange={(e) => set({ teacher_id: e.target.value })}
-                className="w-full px-4 py-2.5 bg-[#0d1117] border border-[#30363d] rounded-xl text-[#e6edf3] focus:outline-none focus:ring-1 focus:ring-[#58a6ff] focus:border-[#58a6ff] text-sm transition-colors"
+                className="w-full px-4 py-2.5 bg-canvas border border-edge rounded-xl text-fg focus:outline-none focus:ring-1 focus:ring-accent-400 focus:border-accent-400 text-sm transition-colors"
               >
                 <option value="">Selecione o professor...</option>
                 {teachers.map((t) => (
@@ -403,11 +403,11 @@ export default function AvaliarPage() {
 
           {form.teacher_id && (
             <div>
-              <label className="block text-sm font-semibold text-[#e6edf3] mb-2">
+              <label className="block text-sm font-semibold text-fg mb-2">
                 Disciplina
               </label>
               {subjects.length === 0 ? (
-                <p className="text-sm text-[#8b949e] bg-[#161b22] border border-[#30363d] px-4 py-3 rounded-xl">
+                <p className="text-sm text-fg-muted bg-surface border border-edge px-4 py-3 rounded-xl">
                   Nenhuma disciplina vinculada a este professor.
                 </p>
               ) : (
@@ -421,17 +421,17 @@ export default function AvaliarPage() {
                         'flex items-center justify-between px-4 py-3 rounded-xl border-2 text-left transition-all',
                         form.subject_id === s.id
                           ? 'border-brand-500 bg-brand-100'
-                          : 'border-[#30363d] bg-[#161b22] hover:border-[#8b949e]'
+                          : 'border-edge bg-surface hover:border-fg-muted'
                       )}
                     >
                       <div>
                         <span className={cn(
                           'text-sm font-semibold',
-                          form.subject_id === s.id ? 'text-brand-400' : 'text-[#e6edf3]'
+                          form.subject_id === s.id ? 'text-brand-400' : 'text-fg'
                         )}>
                           {s.name}
                         </span>
-                        <span className="text-xs text-[#6e7681] ml-2 font-mono">{s.code}</span>
+                        <span className="text-xs text-fg-subtle ml-2 font-mono">{s.code}</span>
                       </div>
                       {s.modality === 'ead' && <Badge variant="ead">EAD</Badge>}
                     </button>
@@ -457,9 +457,9 @@ export default function AvaliarPage() {
       {/* ── Step 2: Notas ───────────────────────────────────────────── */}
       {step === 2 && (
         <div className="space-y-7">
-          <div className="bg-[#161b22] border border-[#30363d] rounded-xl px-4 py-3 text-sm text-[#8b949e]">
-            Avaliando <strong className="text-[#e6edf3]">{teachers.find((t) => t.id === form.teacher_id)?.name}</strong>
-            {' '}em <strong className="text-[#e6edf3]">{selectedSubject?.name}</strong>
+          <div className="bg-surface border border-edge rounded-xl px-4 py-3 text-sm text-fg-muted">
+            Avaliando <strong className="text-fg">{teachers.find((t) => t.id === form.teacher_id)?.name}</strong>
+            {' '}em <strong className="text-fg">{selectedSubject?.name}</strong>
           </div>
 
           <StarPicker
@@ -502,9 +502,9 @@ export default function AvaliarPage() {
       {/* ── Step 3: Detalhes + Envio ─────────────────────────────────── */}
       {step === 3 && (
         <div className="space-y-7">
-          <div className="bg-[#161b22] border border-[#30363d] rounded-xl px-4 py-3 text-sm text-[#8b949e]">
-            Avaliando <strong className="text-[#e6edf3]">{teachers.find((t) => t.id === form.teacher_id)?.name}</strong>
-            {' '}em <strong className="text-[#e6edf3]">{selectedSubject?.name}</strong>
+          <div className="bg-surface border border-edge rounded-xl px-4 py-3 text-sm text-fg-muted">
+            Avaliando <strong className="text-fg">{teachers.find((t) => t.id === form.teacher_id)?.name}</strong>
+            {' '}em <strong className="text-fg">{selectedSubject?.name}</strong>
           </div>
 
           <BoolPicker
@@ -553,8 +553,8 @@ export default function AvaliarPage() {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-[#e6edf3] mb-2">
-              Comentário <span className="text-[#6e7681] font-normal">(opcional)</span>
+            <label className="block text-sm font-medium text-fg mb-2">
+              Comentário <span className="text-fg-subtle font-normal">(opcional)</span>
             </label>
             <textarea
               value={form.comment}
@@ -562,9 +562,9 @@ export default function AvaliarPage() {
               placeholder="Conte mais sobre sua experiência com este professor..."
               maxLength={1000}
               rows={4}
-              className="w-full px-4 py-3 bg-[#0d1117] border border-[#30363d] rounded-xl text-[#e6edf3] placeholder:text-[#6e7681] focus:outline-none focus:ring-1 focus:ring-[#58a6ff] focus:border-[#58a6ff] text-sm resize-none transition-colors"
+              className="w-full px-4 py-3 bg-canvas border border-edge rounded-xl text-fg placeholder:text-fg-subtle focus:outline-none focus:ring-1 focus:ring-accent-400 focus:border-accent-400 text-sm resize-none transition-colors"
             />
-            <p className="text-xs text-[#6e7681] text-right mt-1">
+            <p className="text-xs text-fg-subtle text-right mt-1">
               {form.comment.length}/1000
             </p>
           </div>

@@ -81,18 +81,18 @@ export default async function CoursePage({ params, searchParams }: Props) {
     <div className="container-page py-10">
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-3">
-          <Link href="/" className="text-sm text-[#6e7681] hover:text-[#3fb950] transition-colors">
+          <Link href="/" className="text-sm text-fg-subtle hover:text-brand-400 transition-colors">
             Início
           </Link>
-          <span className="text-[#30363d]">/</span>
-          <span className="text-sm text-[#8b949e]">{codigo.toUpperCase()}</span>
+          <span className="text-edge">/</span>
+          <span className="text-sm text-fg-muted">{codigo.toUpperCase()}</span>
         </div>
         <Badge variant="info" className="mb-3">
           {codigo.toUpperCase()}
         </Badge>
-        <h1 className="text-4xl font-bold text-[#e6edf3] mb-2">{courseLabel}</h1>
+        <h1 className="text-4xl font-bold text-fg mb-2">{courseLabel}</h1>
         {selectedVersion && (
-          <p className="text-[#6e7681] text-sm">
+          <p className="text-fg-subtle text-sm">
             {selectedVersion.campus} · Matriz {selectedVersion.name.split('—')[0].trim()}
           </p>
         )}
@@ -106,8 +106,8 @@ export default async function CoursePage({ params, searchParams }: Props) {
               href={`/curso/${codigo}?turno=matutino`}
               className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-2xl border-2 font-semibold text-base transition-all ${
                 selectedShift === 'Matutino'
-                  ? 'border-amber-500 bg-[#2d1f00] text-amber-400'
-                  : 'border-[#30363d] bg-[#161b22] text-[#6e7681] hover:border-[#8b949e] hover:text-[#8b949e]'
+                  ? 'border-amber-500 bg-amber-950/30 text-amber-400'
+                  : 'border-edge bg-surface text-fg-subtle hover:border-fg-muted hover:text-fg-muted'
               }`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,8 +122,8 @@ export default async function CoursePage({ params, searchParams }: Props) {
               href={`/curso/${codigo}?turno=noturno`}
               className={`flex-1 flex items-center justify-center gap-2.5 py-4 rounded-2xl border-2 font-semibold text-base transition-all ${
                 selectedShift === 'Noturno'
-                  ? 'border-[#58a6ff] bg-accent-100 text-accent-400'
-                  : 'border-[#30363d] bg-[#161b22] text-[#6e7681] hover:border-[#8b949e] hover:text-[#8b949e]'
+                  ? 'border-accent-400 bg-accent-100 text-accent-400'
+                  : 'border-edge bg-surface text-fg-subtle hover:border-fg-muted hover:text-fg-muted'
               }`}
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,30 +137,36 @@ export default async function CoursePage({ params, searchParams }: Props) {
       )}
 
       {semesterNumbers.map((num) => (
-        <div key={num} className="mb-8">
+        <div key={num} className="mb-10">
+          {/* Cabeçalho do semestre com acento verde */}
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 rounded-xl bg-brand-100 flex items-center justify-center flex-shrink-0">
-              <span className="text-brand-400 text-sm font-bold">{num}</span>
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-600 to-brand-700 flex items-center justify-center flex-shrink-0 shadow-sm">
+              <span className="text-white text-sm font-bold">{num}</span>
             </div>
-            <h2 className="text-lg font-bold text-[#e6edf3]">{num}º Semestre</h2>
-            <span className="text-xs text-[#6e7681] font-medium">
-              {bySemester[num].length} disciplinas
-            </span>
+            <div>
+              <h2 className="text-base font-bold text-fg leading-none">{num}º Semestre</h2>
+              <span className="text-xs text-fg-subtle">{bySemester[num].length} disciplinas</span>
+            </div>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {bySemester[num].map((item) => (
-              <Link key={item.id} href={`/disciplina/${item.subject?.id}`}>
-                <Card hover className="p-4 h-full">
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <span className="text-xs font-mono text-[#6e7681]">{item.subject?.code}</span>
+              <Link key={item.id} href={`/disciplina/${item.subject?.id}`} className="group">
+                {/* Card com borda esquerda verde */}
+                <div className="bg-surface border border-edge rounded-xl p-4 h-full flex flex-col gap-2
+                  group-hover:border-brand-600 group-hover:bg-surface-hover transition-all duration-200
+                  border-l-4 border-l-brand-600">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="text-[10px] font-mono text-fg-subtle bg-surface-2 px-1.5 py-0.5 rounded">
+                      {item.subject?.code}
+                    </span>
                     {item.subject?.modality === 'ead' && (
                       <Badge variant="ead" className="flex-shrink-0">EAD</Badge>
                     )}
                   </div>
-                  <p className="text-sm font-semibold text-[#e6edf3] leading-snug">
+                  <p className="text-sm font-semibold text-fg leading-snug group-hover:text-brand-400 transition-colors">
                     {item.subject?.name}
                   </p>
-                </Card>
+                </div>
               </Link>
             ))}
           </div>
@@ -170,25 +176,30 @@ export default async function CoursePage({ params, searchParams }: Props) {
       {electives.length > 0 && (
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 rounded-xl bg-[#1a0533] flex items-center justify-center flex-shrink-0">
-              <span className="text-purple-400 text-sm font-bold">E</span>
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#6e40c9] to-[#4a2d8a] flex items-center justify-center flex-shrink-0 shadow-sm">
+              <span className="text-white text-sm font-bold">E</span>
             </div>
-            <h2 className="text-lg font-bold text-[#e6edf3]">Disciplinas Eletivas</h2>
-            <Badge variant="ead">EAD</Badge>
-            <span className="text-xs text-[#6e7681] font-medium">{electives.length} disponíveis</span>
+            <div>
+              <h2 className="text-base font-bold text-fg leading-none">Disciplinas Eletivas</h2>
+              <span className="text-xs text-fg-subtle">{electives.length} disponíveis · Todas EAD</span>
+            </div>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {electives.map((item) => (
-              <Link key={item.id} href={`/disciplina/${item.subject?.id}`}>
-                <Card hover className="p-4 h-full">
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <span className="text-xs font-mono text-[#6e7681]">{item.subject?.code}</span>
+              <Link key={item.id} href={`/disciplina/${item.subject?.id}`} className="group">
+                <div className="bg-surface border border-edge rounded-xl p-4 h-full flex flex-col gap-2
+                  group-hover:border-accent-500 group-hover:bg-surface-hover transition-all duration-200
+                  border-l-4 border-l-accent-500">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="text-[10px] font-mono text-fg-subtle bg-surface-2 px-1.5 py-0.5 rounded">
+                      {item.subject?.code}
+                    </span>
                     <Badge variant="ead" className="flex-shrink-0">EAD</Badge>
                   </div>
-                  <p className="text-sm font-semibold text-[#e6edf3] leading-snug">
+                  <p className="text-sm font-semibold text-fg leading-snug group-hover:text-accent-400 transition-colors">
                     {item.subject?.name}
                   </p>
-                </Card>
+                </div>
               </Link>
             ))}
           </div>

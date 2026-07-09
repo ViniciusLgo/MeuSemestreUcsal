@@ -59,27 +59,27 @@ export default async function TeacherPage({ params }: Props) {
     <div className="container-page py-10">
       <div className="mb-10">
         <div className="flex items-center gap-2 mb-6">
-          <Link href="/" className="text-sm text-[#6e7681] hover:text-[#3fb950] transition-colors">
+          <Link href="/" className="text-sm text-fg-subtle hover:text-brand-400 transition-colors">
             Início
           </Link>
-          <span className="text-[#30363d]">/</span>
-          <span className="text-sm text-[#8b949e]">{teacher.name}</span>
+          <span className="text-edge">/</span>
+          <span className="text-sm text-fg-muted">{teacher.name}</span>
         </div>
 
         <div className="flex items-start gap-5">
           <Avatar name={teacher.name} size="lg" />
           <div>
-            <h1 className="text-4xl font-bold text-[#e6edf3] mb-1">{teacher.name}</h1>
-            <p className="text-[#6e7681] text-sm mb-2">
+            <h1 className="text-4xl font-bold text-fg mb-1">{teacher.name}</h1>
+            <p className="text-fg-subtle text-sm mb-2">
               {reviews.length} {reviews.length === 1 ? 'avaliação' : 'avaliações'} de alunos
             </p>
             {reviews.length > 0 && (
               <div className="flex items-center gap-2">
                 <StarRating value={avgOf(reviews, 'rating_general')} />
-                <span className="font-bold text-[#e6edf3]">
+                <span className="font-bold text-fg">
                   {avgOf(reviews, 'rating_general').toFixed(1)}
                 </span>
-                <span className="text-[#6e7681] text-sm">nota geral</span>
+                <span className="text-fg-subtle text-sm">nota geral</span>
               </div>
             )}
           </div>
@@ -90,24 +90,24 @@ export default async function TeacherPage({ params }: Props) {
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-10">
           {stats.map((m) => (
             <Card key={m.label} className="text-center py-4 px-3">
-              <div className="text-2xl font-bold text-[#e6edf3] tabular-nums">
+              <div className="text-2xl font-bold text-fg tabular-nums">
                 {m.value.toFixed(1)}
               </div>
-              <div className="text-xs text-[#6e7681] mt-1">{m.label}</div>
+              <div className="text-xs text-fg-subtle mt-1">{m.label}</div>
             </Card>
           ))}
           <Card className="text-center py-4 px-3">
-            <div className="text-2xl font-bold text-[#3fb950] tabular-nums">
+            <div className="text-2xl font-bold text-brand-400 tabular-nums">
               {pctRecommend}%
             </div>
-            <div className="text-xs text-[#6e7681] mt-1">Recomenda</div>
+            <div className="text-xs text-fg-subtle mt-1">Recomenda</div>
           </Card>
         </div>
       )}
 
       {subjects.length > 0 && (
         <div className="mb-10">
-          <h2 className="text-xl font-bold text-[#e6edf3] mb-4">Disciplinas lecionadas</h2>
+          <h2 className="text-xl font-bold text-fg mb-4">Disciplinas lecionadas</h2>
           <div className="flex flex-wrap gap-2">
             {subjects.map((s: SubjectBasic) => (
               <Link key={s.id} href={`/disciplina/${s.id}`}>
@@ -125,10 +125,10 @@ export default async function TeacherPage({ params }: Props) {
 
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-[#e6edf3]">
+          <h2 className="text-xl font-bold text-fg">
             Avaliações
             {reviews.length > 0 && (
-              <span className="ml-2 text-base font-normal text-[#6e7681]">
+              <span className="ml-2 text-base font-normal text-fg-subtle">
                 ({reviews.length})
               </span>
             )}
@@ -144,7 +144,7 @@ export default async function TeacherPage({ params }: Props) {
         {reviews.length === 0 ? (
           <Card className="text-center py-16">
             <div className="text-4xl mb-4">📝</div>
-            <p className="text-[#8b949e] font-medium mb-2">
+            <p className="text-fg-muted font-medium mb-2">
               Nenhuma avaliação ainda para {teacher.name}.
             </p>
             <Link
@@ -163,14 +163,14 @@ export default async function TeacherPage({ params }: Props) {
                     {review.subject && (
                       <Link
                         href={`/disciplina/${review.subject.id}`}
-                        className="text-sm font-semibold text-[#58a6ff] hover:underline"
+                        className="text-sm font-semibold text-accent-400 hover:underline"
                       >
                         {review.subject.name}
                       </Link>
                     )}
                     <div className="flex items-center gap-2 mt-1">
                       <StarRating value={review.rating_general} size="sm" />
-                      <span className="text-sm font-bold text-[#e6edf3]">
+                      <span className="text-sm font-bold text-fg">
                         {review.rating_general}/5
                       </span>
                     </div>
@@ -194,20 +194,20 @@ export default async function TeacherPage({ params }: Props) {
                     { label: 'Carga', value: review.rating_workload },
                     { label: 'Dificuldade', value: review.rating_difficulty },
                   ].map((m) => (
-                    <div key={m.label} className="bg-[#21262d] rounded-xl py-2.5 text-center">
-                      <div className="text-base font-bold text-[#e6edf3]">{m.value}</div>
-                      <div className="text-xs text-[#6e7681] mt-0.5">{m.label}</div>
+                    <div key={m.label} className="bg-surface-2 rounded-xl py-2.5 text-center">
+                      <div className="text-base font-bold text-fg">{m.value}</div>
+                      <div className="text-xs text-fg-subtle mt-0.5">{m.label}</div>
                     </div>
                   ))}
                 </div>
 
                 {review.comment && (
-                  <p className="text-sm text-[#8b949e] leading-relaxed border-t border-[#21262d] pt-3">
+                  <p className="text-sm text-fg-muted leading-relaxed border-t border-edge-muted pt-3">
                     &ldquo;{review.comment}&rdquo;
                   </p>
                 )}
 
-                <p className="text-xs text-[#6e7681] mt-3">
+                <p className="text-xs text-fg-subtle mt-3">
                   {new Date(review.created_at).toLocaleDateString('pt-BR', {
                     month: 'long',
                     year: 'numeric',

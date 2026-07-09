@@ -16,7 +16,7 @@ export function StarRating({ value, max = 5, size = 'md', className }: StarRatin
         return (
           <svg
             key={i}
-            className={cn(starSize, filled ? 'text-amber-400' : 'text-[#30363d]')}
+            className={cn(starSize, filled ? 'text-amber-400' : 'text-edge')}
             fill="currentColor"
             viewBox="0 0 20 20"
           >

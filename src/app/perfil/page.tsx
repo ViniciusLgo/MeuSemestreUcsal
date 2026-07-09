@@ -24,32 +24,32 @@ export default async function PerfilPage() {
 
   return (
     <div className="container-page py-12 max-w-lg mx-auto">
-      <h1 className="text-2xl font-bold text-[#e6edf3] mb-8">Meu perfil</h1>
+      <h1 className="text-2xl font-bold text-fg mb-8">Meu perfil</h1>
 
-      <div className="bg-[#161b22] rounded-2xl border border-[#30363d] divide-y divide-[#21262d]">
+      <div className="bg-surface rounded-2xl border border-edge divide-y divide-edge-muted">
         <div className="px-6 py-5 flex items-center justify-between">
           <div>
-            <p className="text-xs text-[#6e7681] font-medium uppercase tracking-wide mb-1">Email</p>
-            <p className="text-[#e6edf3] font-medium">{profile.email}</p>
+            <p className="text-xs text-fg-subtle font-medium uppercase tracking-wide mb-1">Email</p>
+            <p className="text-fg font-medium">{profile.email}</p>
           </div>
         </div>
 
         <div className="px-6 py-5 flex items-center justify-between">
           <div>
-            <p className="text-xs text-[#6e7681] font-medium uppercase tracking-wide mb-1">Curso</p>
-            <p className="text-[#e6edf3] font-medium">
+            <p className="text-xs text-fg-subtle font-medium uppercase tracking-wide mb-1">Curso</p>
+            <p className="text-fg font-medium">
               {courseCode
                 ? `${courseCode.code} — ${courseCode.name}`
-                : <span className="text-[#6e7681] italic">Não configurado</span>}
+                : <span className="text-fg-subtle italic">Não configurado</span>}
             </p>
           </div>
         </div>
 
         <div className="px-6 py-5 flex items-center justify-between">
           <div>
-            <p className="text-xs text-[#6e7681] font-medium uppercase tracking-wide mb-1">Turno</p>
-            <p className="text-[#e6edf3] font-medium">
-              {profile.shift ?? <span className="text-[#6e7681] italic">Não configurado</span>}
+            <p className="text-xs text-fg-subtle font-medium uppercase tracking-wide mb-1">Turno</p>
+            <p className="text-fg font-medium">
+              {profile.shift ?? <span className="text-fg-subtle italic">Não configurado</span>}
             </p>
           </div>
         </div>
@@ -66,11 +66,11 @@ export default async function PerfilPage() {
       <div className="mt-4 flex flex-col gap-3">
         <Link
           href="/perfil/configurar"
-          className="w-full text-center text-sm font-semibold border border-[#30363d] text-[#e6edf3] px-4 py-2.5 rounded-xl hover:bg-[#21262d] hover:border-[#8b949e] transition-colors bg-[#161b22]"
+          className="w-full text-center text-sm font-semibold border border-edge text-fg px-4 py-2.5 rounded-xl hover:bg-surface-2 hover:border-fg-muted transition-colors bg-surface"
         >
           Alterar curso / turno
         </Link>
-        <SignOutButton className="w-full text-center text-sm font-medium text-red-400 border border-[#30363d] px-4 py-2.5 rounded-xl hover:bg-[#2d0a0a] hover:border-red-700 transition-colors bg-[#161b22]" />
+        <SignOutButton className="w-full text-center text-sm font-medium text-red-400 border border-edge px-4 py-2.5 rounded-xl hover:bg-[#2d0a0a] hover:border-red-700 transition-colors bg-surface" />
       </div>
     </div>
   )
