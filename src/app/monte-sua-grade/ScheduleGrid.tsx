@@ -9,25 +9,17 @@ export const MANHA_SLOTS = [
   { id: 3, label: '11:15', range: '11:15–12:30' },
 ] as const
 
-export const TARDE_SLOTS = [
-  { id: 4, label: '13:00', range: '13:00–14:15' },
-  { id: 5, label: '14:25', range: '14:25–15:40' },
-  { id: 6, label: '15:50', range: '15:50–17:05' },
-  { id: 7, label: '17:15', range: '17:15–18:30' },
-] as const
-
 export const NOITE_SLOTS = [
-  { id: 8, label: '19:00', range: '19:00–20:15' },
-  { id: 9, label: '20:25', range: '20:25–21:40' },
+  { id: 4, label: '19:00', range: '19:00–20:15' },
+  { id: 5, label: '20:25', range: '20:25–21:40' },
 ] as const
 
 export type TimeSlot = { id: number; label: string; range: string }
-export const ALL_SLOTS: TimeSlot[] = [...MANHA_SLOTS, ...TARDE_SLOTS, ...NOITE_SLOTS]
+export const ALL_SLOTS: TimeSlot[] = [...MANHA_SLOTS, ...NOITE_SLOTS]
 
 export const PERIODS = [
-  { label: 'Manhã',  slots: MANHA_SLOTS as unknown as TimeSlot[] },
-  { label: 'Tarde',  slots: TARDE_SLOTS as unknown as TimeSlot[] },
-  { label: 'Noite',  slots: NOITE_SLOTS as unknown as TimeSlot[] },
+  { label: 'Manhã', slots: MANHA_SLOTS as unknown as TimeSlot[] },
+  { label: 'Noite', slots: NOITE_SLOTS as unknown as TimeSlot[] },
 ] as const
 
 // ─── Dias ─────────────────────────────────────────────────────────────────────
@@ -66,34 +58,21 @@ interface Props {
   scheduleMap: ScheduleMap
   onRemove: (key: string) => void
   compact?: boolean
-  /** Quais períodos mostrar. undefined = todos */
-  periods?: Array<'manha' | 'tarde' | 'noite'>
 }
 
 // ─── Componente ───────────────────────────────────────────────────────────────
 
-export function ScheduleGrid({ scheduleMap, onRemove, compact = false, periods }: Props) {
+export function ScheduleGrid({ scheduleMap, onRemove, compact = false }: Props) {
   const hasAnyCell = Object.keys(scheduleMap).length > 0
 
-  const visiblePeriods = PERIODS.filter((p) => {
-    if (!periods) return true
-    if (p.label === 'Manhã')  return periods.includes('manha')
-    if (p.label === 'Tarde')  return periods.includes('tarde')
-    if (p.label === 'Noite')  return periods.includes('noite')
-    return true
-  })
-
-  // Filtra só os períodos que têm pelo menos uma célula ocupada (ou todos se nada marcado)
-  const periodsToShow = hasAnyCell
-    ? visiblePeriods.filter((period) =>
-        period.slots.some((slot) =>
-          DAYS.some((day) => !!scheduleMap[`${day}:${slot.id}`])
-        )
+  // Mostra só os períodos que têm aula marcada; se nada marcado, mostra todos
+  const finalPeriods = hasAnyCell
+    ? PERIODS.filter((period) =>
+        period.slots.some((slot) => DAYS.some((day) => !!scheduleMap[`${day}:${slot.id}`]))
       )
-    : visiblePeriods
+    : [...PERIODS]
 
-  // Se nenhum período tem célula mas há grade, mostra todos os visíveis
-  const finalPeriods = periodsToShow.length > 0 ? periodsToShow : visiblePeriods
+  const periodsToRender = finalPeriods.length > 0 ? finalPeriods : [...PERIODS]
 
   const dayLabels: Record<string, string> = {
     SEG: compact ? 'S' : 'Seg',
@@ -118,7 +97,7 @@ export function ScheduleGrid({ scheduleMap, onRemove, compact = false, periods }
           </tr>
         </thead>
         <tbody>
-          {finalPeriods.map((period, pi) => (
+          {periodsToRender.map((period) => (
             <>
               {/* Header de período */}
               {!compact && (

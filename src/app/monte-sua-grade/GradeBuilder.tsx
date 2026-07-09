@@ -156,6 +156,7 @@ export function GradeBuilder() {
   const [slotConfigs, setSlotConfigs] = useState<SlotConfigs>({})
   const [loading, setLoading] = useState(false)
   const [expandedSchedule, setExpandedSchedule] = useState<string | null>(null)
+  const [showSummary, setShowSummary] = useState(false)
 
   const maxSemesters = COURSES.find((c) => c.code === course)?.semesters ?? 8
   const selectedVersion = versions.find((v) => v.id === selectedVersionId)
@@ -408,24 +409,26 @@ export function GradeBuilder() {
                             </div>
                             {selTid && (
                               <div className="flex items-center gap-2 flex-shrink-0">
-                                {isPlaced ? (
-                                  <span className="text-xs text-brand-400 font-medium">
+                                {isPlaced && !isExpanded && (
+                                  <span className="text-xs text-brand-400 font-semibold">
                                     ✓ {config.days.join('/')} {ALL_SLOTS.find(s => s.id === config.slotId)?.label}
                                   </span>
-                                ) : null}
+                                )}
                                 <button
                                   onClick={() => setExpandedSchedule(isExpanded ? null : slot.subject_id)}
-                                  className={`text-xs px-3 py-1 rounded-lg border transition-all ${
+                                  className={`text-xs px-3 py-1.5 rounded-lg font-semibold transition-all ${
                                     isExpanded
-                                      ? `${color.bg} text-white border-transparent`
+                                      ? `${color.bg} text-white`
                                       : isPlaced
-                                        ? 'border-brand-400 text-brand-400 hover:bg-brand-100'
-                                        : 'border-edge text-fg-muted hover:border-fg-muted hover:text-fg'
+                                        ? 'bg-brand-100 border border-brand-400 text-brand-400 hover:bg-brand-200'
+                                        : 'bg-accent-500 text-white hover:bg-accent-600'
                                   }`}>
-                                  {isExpanded ? '✕ fechar' : isPlaced ? 'editar horário' : '+ horário'}
+                                  {isExpanded ? '✕ Fechar' : isPlaced ? '✏ Editar horário' : '+ Definir horário'}
                                 </button>
                                 <button onClick={() => selectTeacher(slot.subject_id, null)}
-                                  className="text-xs text-fg-subtle hover:text-fg-muted">limpar</button>
+                                  className="text-xs px-2.5 py-1.5 rounded-lg border border-edge text-fg-muted hover:border-red-500 hover:text-red-400 hover:bg-[#2d0a0a] transition-all font-medium">
+                                  Limpar
+                                </button>
                               </div>
                             )}
                           </div>
@@ -555,7 +558,7 @@ export function GradeBuilder() {
                               </div>
 
                               <button onClick={() => setExpandedSchedule(null)}
-                                className="text-xs font-semibold text-brand-400 hover:text-brand-500 transition-colors">
+                                className="w-full py-2 rounded-xl bg-brand-600 text-white text-sm font-bold hover:bg-brand-700 transition-colors mt-1">
                                 ✓ Confirmar horário
                               </button>
                             </div>
@@ -602,18 +605,22 @@ export function GradeBuilder() {
             {/* Legenda */}
             {selectedCount > 0 && (
               <div className="bg-surface border border-edge rounded-2xl p-4">
-                <p className="text-[11px] font-semibold text-fg-subtle uppercase tracking-wide mb-2">Professores selecionados</p>
+                <p className="text-[11px] font-semibold text-fg-subtle uppercase tracking-wide mb-2">Selecionados</p>
                 <div className="space-y-1.5">
                   {slots.filter((s) => selections[s.subject_id]).map((s) => {
                     const colorIdx = colorMap[s.subject_id] ?? 0
                     const teacher = s.teachers.find((t) => t.teacher_id === selections[s.subject_id])
+                    const cfg = slotConfigs[s.subject_id]
                     return (
                       <div key={s.subject_id} className="flex items-center gap-2">
                         <div className={`w-2.5 h-2.5 rounded flex-shrink-0 ${SUBJECT_COLORS[colorIdx].bg}`} />
                         <span className="text-xs font-mono text-fg-muted">{s.subject_code}</span>
-                        <span className="text-xs text-fg-subtle truncate">{teacher?.teacher_name.split(' ')[0]}</span>
+                        <span className="text-xs text-fg-subtle truncate flex-1">{teacher?.teacher_name.split(' ')[0]}</span>
+                        {cfg?.days.length > 0 && (
+                          <span className="text-[10px] text-brand-400">✓</span>
+                        )}
                         {teacher?.review_count ? (
-                          <span className={`text-xs font-bold ml-auto flex-shrink-0 ${
+                          <span className={`text-xs font-bold flex-shrink-0 ${
                             teacher.avg_rating >= 4 ? 'text-brand-400'
                               : teacher.avg_rating >= 3 ? 'text-amber-400' : 'text-red-400'
                           }`}>{teacher.avg_rating.toFixed(1)}</span>
@@ -624,8 +631,105 @@ export function GradeBuilder() {
                 </div>
               </div>
             )}
+
+            {/* Botão ver resumo */}
+            {selectedCount > 0 && (
+              <button onClick={() => setShowSummary(true)}
+                className="w-full py-3 bg-gradient-to-r from-brand-600 to-accent-500 text-white font-bold text-sm rounded-2xl hover:opacity-90 transition-opacity shadow-lg">
+                Ver resumo da grade →
+              </button>
+            )}
           </div>
         </div>
+
+        {/* ── Modal de Resumo ──────────────────────────────────────────── */}
+        {showSummary && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+            onClick={(e) => { if (e.target === e.currentTarget) setShowSummary(false) }}>
+            <div className="bg-canvas border border-edge rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl">
+              {/* Header */}
+              <div className="px-6 pt-6 pb-4 border-b border-edge-muted flex items-center justify-between">
+                <div>
+                  <h2 className="text-xl font-bold text-fg">Resumo da grade</h2>
+                  <p className="text-sm text-fg-muted mt-0.5">
+                    {course} · {activeSemesters.map((n) => `${n}º`).join(', ')} semestre
+                    {score !== null && (
+                      <span className={`ml-3 font-bold ${score >= 4 ? 'text-brand-400' : score >= 3 ? 'text-amber-400' : 'text-red-400'}`}>
+                        Score médio: {score.toFixed(1)} ★
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <button onClick={() => setShowSummary(false)}
+                  className="w-8 h-8 flex items-center justify-center rounded-xl border border-edge text-fg-muted hover:text-fg hover:border-fg-muted transition-all text-lg">
+                  ✕
+                </button>
+              </div>
+
+              {/* Grade visual */}
+              <div className="px-6 py-4 border-b border-edge-muted overflow-x-auto">
+                <ScheduleGrid scheduleMap={scheduleMap} onRemove={() => {}} compact />
+              </div>
+
+              {/* Lista de disciplinas */}
+              <div className="px-6 py-4 space-y-3">
+                <p className="text-[11px] font-semibold text-fg-subtle uppercase tracking-wider">Disciplinas e professores</p>
+                {slots.filter((s) => selections[s.subject_id]).map((s) => {
+                  const colorIdx = colorMap[s.subject_id] ?? 0
+                  const teacher = s.teachers.find((t) => t.teacher_id === selections[s.subject_id])
+                  const cfg = slotConfigs[s.subject_id]
+                  const slotLabel = cfg?.days.length > 0
+                    ? `${cfg.days.join(', ')} · ${ALL_SLOTS.find(sl => sl.id === cfg.slotId)?.range ?? ''}`
+                    : 'Horário não definido'
+                  return (
+                    <div key={s.subject_id} className="flex items-start gap-3 bg-surface border border-edge-muted rounded-2xl p-4">
+                      <div className={`w-3 h-3 rounded-full flex-shrink-0 mt-1 ${SUBJECT_COLORS[colorIdx].bg}`} />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-xs font-mono text-fg-subtle">{s.subject_code}</span>
+                          <span className="text-sm font-semibold text-fg">{s.subject_name}</span>
+                        </div>
+                        <p className="text-xs text-fg-muted mt-0.5">
+                          {teacher ? teacher.teacher_name : <span className="italic text-fg-subtle">Prof. não selecionado</span>}
+                          {teacher?.review_count ? (
+                            <span className={`ml-2 font-bold ${
+                              teacher.avg_rating >= 4 ? 'text-brand-400'
+                                : teacher.avg_rating >= 3 ? 'text-amber-400' : 'text-red-400'
+                            }`}>{teacher.avg_rating.toFixed(1)} ★</span>
+                          ) : null}
+                        </p>
+                        <p className={`text-xs mt-1 ${cfg?.days.length > 0 ? 'text-brand-400' : 'text-fg-subtle italic'}`}>
+                          {slotLabel}
+                          {cfg?.numSlots > 1 ? ` (${cfg.numSlots} aulas)` : ''}
+                        </p>
+                      </div>
+                      <Link href={`/professor/${teacher?.teacher_id ?? ''}`}
+                        className="text-xs text-accent-400 hover:underline flex-shrink-0 self-center">
+                        Ver perfil →
+                      </Link>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {/* Rodapé */}
+              <div className="px-6 pb-6 flex gap-3">
+                <button onClick={handlePrint}
+                  className="flex-1 py-2.5 bg-surface border border-edge rounded-xl text-sm font-semibold text-fg-muted hover:border-fg-muted hover:text-fg transition-all flex items-center justify-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                      d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                  Imprimir
+                </button>
+                <button onClick={() => setShowSummary(false)}
+                  className="flex-1 py-2.5 bg-brand-600 text-white rounded-xl text-sm font-bold hover:bg-brand-700 transition-colors">
+                  Continuar editando
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   )
