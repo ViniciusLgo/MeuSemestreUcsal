@@ -13,6 +13,8 @@ import Link from 'next/link'
 type Teacher = { id: string; name: string; slug: string }
 type Subject = { id: string; code: string; name: string; modality: 'presencial' | 'ead' | 'hibrida' }
 
+type AssessmentStyleBase = 'prova' | 'projeto' | 'trabalho'
+
 type FormData = {
   teacher_id: string
   subject_id: string
@@ -23,7 +25,7 @@ type FormData = {
   rating_difficulty: number
   would_recommend: boolean | null
   attendance_pressure: 'baixa' | 'media' | 'alta' | null
-  assessment_style: 'prova' | 'projeto' | 'trabalho' | 'misto' | null
+  assessment_styles: AssessmentStyleBase[]  // multi-select, mapeado p/ 'misto' se > 1
   comment: string
   had_in_person_event: boolean | null
   relevant_to_course: boolean | null
@@ -39,7 +41,7 @@ const emptyForm: FormData = {
   rating_difficulty: 0,
   would_recommend: null,
   attendance_pressure: null,
-  assessment_style: null,
+  assessment_styles: [],
   comment: '',
   had_in_person_event: null,
   relevant_to_course: null,
@@ -264,7 +266,11 @@ export default function AvaliarPage() {
       rating_difficulty: form.rating_difficulty,
       would_recommend: form.would_recommend,
       attendance_pressure: form.attendance_pressure,
-      assessment_style: form.assessment_style,
+      assessment_style: form.assessment_styles.length === 0
+        ? null
+        : form.assessment_styles.length === 1
+          ? form.assessment_styles[0]
+          : 'misto',
       comment: form.comment.trim() || null,
       had_in_person_event: isEad ? form.had_in_person_event : null,
       relevant_to_course: isEad ? form.relevant_to_course : null,
@@ -524,17 +530,38 @@ export default function AvaliarPage() {
             onChange={(v) => set({ attendance_pressure: v })}
           />
 
-          <OptionPicker
-            label="Estilo de avaliação"
-            value={form.assessment_style}
-            options={[
-              { value: 'prova', label: 'Prova' },
-              { value: 'projeto', label: 'Projeto' },
-              { value: 'trabalho', label: 'Trabalho' },
-              { value: 'misto', label: 'Misto' },
-            ]}
-            onChange={(v) => set({ assessment_style: v })}
-          />
+          <div>
+            <p className="text-sm font-medium text-fg mb-2">
+              Estilo de avaliação{' '}
+              <span className="text-xs font-normal text-fg-subtle">(pode selecionar mais de um)</span>
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {(['prova', 'projeto', 'trabalho'] as const).map((v) => {
+                const labels = { prova: 'Prova', projeto: 'Projeto', trabalho: 'Trabalho' }
+                const active = form.assessment_styles.includes(v)
+                return (
+                  <button key={v} type="button"
+                    onClick={() => {
+                      const next = active
+                        ? form.assessment_styles.filter((x) => x !== v)
+                        : [...form.assessment_styles, v]
+                      set({ assessment_styles: next })
+                    }}
+                    className={cn(
+                      'px-3 py-1.5 rounded-full text-sm font-medium border transition-all',
+                      active
+                        ? 'bg-brand-600 text-white border-brand-600'
+                        : 'bg-surface text-fg-muted border-edge hover:border-brand-400 hover:text-brand-400'
+                    )}>
+                    {labels[v]}
+                  </button>
+                )
+              })}
+            </div>
+            {form.assessment_styles.length > 1 && (
+              <p className="text-xs text-fg-subtle mt-1.5">Será registrado como "Misto"</p>
+            )}
+          </div>
 
           {/* Campos extras apenas para EAD */}
           {isEad && (

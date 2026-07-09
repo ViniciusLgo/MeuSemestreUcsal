@@ -38,27 +38,27 @@ export default async function ProfessorDetailPage({ params }: Props) {
   return (
     <div className="max-w-2xl">
       <div className="flex items-center gap-3 mb-8">
-        <Link href="/painel-interno/professores" className="text-sm text-slate-400 hover:text-slate-600">
+        <Link href="/painel-interno/professores" className="text-sm text-fg-subtle hover:text-fg-muted">
           ← Professores
         </Link>
-        <span className="text-slate-300">/</span>
-        <h1 className="text-xl font-bold text-slate-900">{teacher.name}</h1>
+        <span className="text-edge">/</span>
+        <h1 className="text-xl font-bold text-fg">{teacher.name}</h1>
       </div>
 
       {/* Disciplinas já vinculadas */}
       {links.length > 0 && (
         <div className="mb-8">
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
+          <p className="text-xs font-semibold text-fg-muted uppercase tracking-wide mb-3">
             Disciplinas vinculadas ({links.length})
           </p>
-          <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
+          <div className="bg-surface rounded-xl border border-edge divide-y divide-edge-muted">
             {links.map((link: any) => (
               <div key={link.id} className="flex items-center justify-between px-4 py-3">
                 <div>
-                  <span className="font-mono text-xs text-slate-400 mr-2">{link.subject?.code}</span>
-                  <span className="text-sm text-slate-900">{link.subject?.name}</span>
+                  <span className="font-mono text-xs text-fg-subtle mr-2">{link.subject?.code}</span>
+                  <span className="text-sm text-fg">{link.subject?.name}</span>
                   {link.course && (
-                    <span className="ml-2 text-xs bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded">
+                    <span className="ml-2 text-xs bg-surface-2 text-fg-muted px-1.5 py-0.5 rounded">
                       {link.course.code}
                     </span>
                   )}
@@ -77,7 +77,7 @@ export default async function ProfessorDetailPage({ params }: Props) {
       {/* Seletor de novas disciplinas */}
       {availableSubjects.length > 0 ? (
         <div>
-          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
+          <p className="text-xs font-semibold text-fg-muted uppercase tracking-wide mb-3">
             Adicionar disciplinas
           </p>
           <SubjectSelector
@@ -88,7 +88,7 @@ export default async function ProfessorDetailPage({ params }: Props) {
           />
         </div>
       ) : (
-        <p className="text-sm text-slate-400">Todas as disciplinas já estão vinculadas.</p>
+        <p className="text-sm text-fg-subtle">Todas as disciplinas já estão vinculadas.</p>
       )}
     </div>
   )

@@ -12,7 +12,7 @@ const STATUS_LABEL: Record<string, string> = {
 
 const STATUS_COLOR: Record<string, string> = {
   publicada: 'bg-emerald-50 text-emerald-700',
-  oculta: 'bg-slate-100 text-slate-500',
+  oculta: 'bg-surface-2 text-fg-muted',
   em_revisao: 'bg-amber-50 text-amber-700',
 }
 
@@ -26,11 +26,11 @@ export default async function AvaliacoesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-900 mb-8">Avaliações</h1>
+      <h1 className="text-2xl font-bold text-fg mb-8">Avaliações</h1>
 
-      <div className="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100">
+      <div className="bg-surface rounded-2xl border border-edge divide-y divide-edge-muted">
         {(reviews ?? []).length === 0 && (
-          <p className="px-6 py-8 text-center text-slate-400 text-sm">Nenhuma avaliação ainda.</p>
+          <p className="px-6 py-8 text-center text-fg-subtle text-sm">Nenhuma avaliação ainda.</p>
         )}
         {(reviews ?? []).map((r: any) => (
           <div key={r.id} className="px-6 py-5">
@@ -40,13 +40,13 @@ export default async function AvaliacoesPage() {
                   <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${STATUS_COLOR[r.status]}`}>
                     {STATUS_LABEL[r.status]}
                   </span>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-fg-subtle">
                     {r.teacher?.name} · {r.subject?.code}
                   </span>
-                  <span className="text-xs text-slate-400">★ {r.rating_general}/5</span>
+                  <span className="text-xs text-fg-subtle">★ {r.rating_general}/5</span>
                 </div>
                 {r.comment && (
-                  <p className="text-sm text-slate-600 truncate">{r.comment}</p>
+                  <p className="text-sm text-fg-muted truncate">{r.comment}</p>
                 )}
               </div>
               <div className="flex gap-2 flex-shrink-0">
@@ -59,7 +59,7 @@ export default async function AvaliacoesPage() {
                 )}
                 {r.status !== 'oculta' && (
                   <form action={setReviewStatus.bind(null, r.id, 'oculta')}>
-                    <button type="submit" className="text-xs font-medium px-3 py-1 rounded-lg text-slate-500 hover:bg-slate-100 transition-colors">
+                    <button type="submit" className="text-xs font-medium px-3 py-1 rounded-lg text-fg-muted hover:bg-surface-2 transition-colors">
                       Ocultar
                     </button>
                   </form>

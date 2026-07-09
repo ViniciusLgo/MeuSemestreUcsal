@@ -69,15 +69,15 @@ export default async function SubjectPage({ params }: Props) {
     <div className="container-page py-10">
       <div className="mb-10">
         <div className="flex items-center gap-2 mb-3">
-          <Link href="/" className="text-sm text-slate-400 hover:text-brand-600 transition-colors">
+          <Link href="/" className="text-sm text-fg-subtle hover:text-brand-600 transition-colors">
             Início
           </Link>
-          <span className="text-slate-300">/</span>
-          <span className="text-sm text-slate-600">{subject.name}</span>
+          <span className="text-edge">/</span>
+          <span className="text-sm text-fg-muted">{subject.name}</span>
         </div>
 
         <div className="flex flex-wrap items-center gap-2 mb-3">
-          <span className="text-xs font-mono text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
+          <span className="text-xs font-mono text-fg-subtle bg-surface-2 px-2 py-0.5 rounded">
             {subject.code}
           </span>
           <Badge variant={isEad ? 'ead' : 'default'}>
@@ -88,32 +88,32 @@ export default async function SubjectPage({ params }: Props) {
           </Badge>
         </div>
 
-        <h1 className="text-4xl font-bold text-slate-900 mb-3">{subject.name}</h1>
+        <h1 className="text-4xl font-bold text-fg mb-3">{subject.name}</h1>
 
         <div className="flex items-center gap-3">
           {reviews.length > 0 ? (
             <>
               <StarRating value={avgGeneral} />
-              <span className="text-lg font-bold text-slate-900">{avgGeneral.toFixed(1)}</span>
-              <span className="text-slate-400 text-sm">({reviews.length} avaliações)</span>
+              <span className="text-lg font-bold text-fg">{avgGeneral.toFixed(1)}</span>
+              <span className="text-fg-subtle text-sm">({reviews.length} avaliações)</span>
             </>
           ) : (
-            <span className="text-slate-400 text-sm">Nenhuma avaliação ainda — seja o primeiro!</span>
+            <span className="text-fg-subtle text-sm">Nenhuma avaliação ainda — seja o primeiro!</span>
           )}
         </div>
       </div>
 
       {teachers.length > 0 && (
         <div className="mb-10">
-          <h2 className="text-xl font-bold text-slate-900 mb-4">
+          <h2 className="text-xl font-bold text-fg mb-4">
             Professores que lecionam esta disciplina
           </h2>
           <div className="flex flex-wrap gap-3">
             {teachers.map((teacher: TeacherBasic) => (
               <Link key={teacher.id} href={`/professor/${teacher.id}`}>
-                <div className="flex items-center gap-3 bg-white border border-slate-100 rounded-2xl px-4 py-3 hover:border-brand-200 hover:shadow-sm transition-all">
+                <div className="flex items-center gap-3 bg-surface border border-edge-muted rounded-2xl px-4 py-3 hover:border-brand-200 hover:shadow-sm transition-all">
                   <Avatar name={teacher.name} size="sm" />
-                  <span className="text-sm font-semibold text-slate-800">{teacher.name}</span>
+                  <span className="text-sm font-semibold text-fg">{teacher.name}</span>
                 </div>
               </Link>
             ))}
@@ -123,10 +123,10 @@ export default async function SubjectPage({ params }: Props) {
 
       <div>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-slate-900">
+          <h2 className="text-xl font-bold text-fg">
             Avaliações
             {reviews.length > 0 && (
-              <span className="ml-2 text-base font-normal text-slate-400">
+              <span className="ml-2 text-base font-normal text-fg-subtle">
                 ({reviews.length})
               </span>
             )}
@@ -142,10 +142,10 @@ export default async function SubjectPage({ params }: Props) {
         {reviews.length === 0 ? (
           <Card className="text-center py-16">
             <div className="text-4xl mb-4">📝</div>
-            <p className="text-slate-500 font-medium mb-2">
+            <p className="text-fg-muted font-medium mb-2">
               Nenhuma avaliação ainda para esta disciplina.
             </p>
-            <p className="text-slate-400 text-sm mb-6">
+            <p className="text-fg-subtle text-sm mb-6">
               Cursa ou já cursou? Compartilhe sua experiência de forma anônima.
             </p>
             <Link
@@ -171,7 +171,7 @@ export default async function SubjectPage({ params }: Props) {
                     )}
                     <div className="flex items-center gap-2 mt-1">
                       <StarRating value={review.rating_general} size="sm" />
-                      <span className="text-sm font-bold text-slate-800">
+                      <span className="text-sm font-bold text-fg">
                         {review.rating_general}/5
                       </span>
                     </div>
@@ -206,20 +206,20 @@ export default async function SubjectPage({ params }: Props) {
                     { label: 'Carga', value: review.rating_workload },
                     { label: 'Dificuldade', value: review.rating_difficulty },
                   ].map((m) => (
-                    <div key={m.label} className="bg-slate-50 rounded-xl py-2.5 text-center">
-                      <div className="text-base font-bold text-slate-900">{m.value}</div>
-                      <div className="text-xs text-slate-400 mt-0.5">{m.label}</div>
+                    <div key={m.label} className="bg-surface-2 rounded-xl py-2.5 text-center">
+                      <div className="text-base font-bold text-fg">{m.value}</div>
+                      <div className="text-xs text-fg-subtle mt-0.5">{m.label}</div>
                     </div>
                   ))}
                 </div>
 
                 {review.comment && (
-                  <p className="text-sm text-slate-600 leading-relaxed border-t border-slate-50 pt-3">
+                  <p className="text-sm text-fg-muted leading-relaxed border-t border-edge-muted pt-3">
                     &ldquo;{review.comment}&rdquo;
                   </p>
                 )}
 
-                <p className="text-xs text-slate-300 mt-3">
+                <p className="text-xs text-edge mt-3">
                   {new Date(review.created_at).toLocaleDateString('pt-BR', {
                     month: 'long',
                     year: 'numeric',

@@ -36,15 +36,15 @@ export default async function MatrizesPage() {
   if (!versions?.length) {
     return (
       <div>
-        <h1 className="text-2xl font-bold text-slate-900 mb-8">Matrizes</h1>
-        <p className="text-slate-400 text-sm">Nenhuma matriz ativa encontrada.</p>
+        <h1 className="text-2xl font-bold text-fg mb-8">Matrizes</h1>
+        <p className="text-fg-subtle text-sm">Nenhuma matriz ativa encontrada.</p>
       </div>
     )
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-900 mb-8">Matrizes curriculares ativas</h1>
+      <h1 className="text-2xl font-bold text-fg mb-8">Matrizes curriculares ativas</h1>
 
       <div className="space-y-10">
         {versions.map((version) => {
@@ -67,12 +67,12 @@ export default async function MatrizesPage() {
             : 'bg-amber-50 text-amber-700 border-amber-200'
 
           return (
-            <div key={version.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
+            <div key={version.id} className="bg-surface rounded-2xl border border-edge overflow-hidden">
               {/* Header da versão */}
-              <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between gap-4 flex-wrap">
+              <div className="px-6 py-5 border-b border-edge-muted flex items-center justify-between gap-4 flex-wrap">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2 py-0.5 rounded">
+                    <span className="text-xs font-bold text-fg-muted bg-surface-2 px-2 py-0.5 rounded">
                       {version.course?.code}
                     </span>
                     {version.shift && (
@@ -81,21 +81,21 @@ export default async function MatrizesPage() {
                       </span>
                     )}
                   </div>
-                  <h2 className="text-lg font-bold text-slate-900">{version.course?.name}</h2>
-                  <p className="text-sm text-slate-400">{version.name} · {version.campus}</p>
+                  <h2 className="text-lg font-bold text-fg">{version.course?.name}</h2>
+                  <p className="text-sm text-fg-subtle">{version.name} · {version.campus}</p>
                 </div>
                 <div className="flex gap-6 text-center">
                   <div>
-                    <p className="text-2xl font-bold text-slate-900 tabular-nums">{mandatory.length}</p>
-                    <p className="text-xs text-slate-400">obrigatórias</p>
+                    <p className="text-2xl font-bold text-fg tabular-nums">{mandatory.length}</p>
+                    <p className="text-xs text-fg-subtle">obrigatórias</p>
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-slate-900 tabular-nums">{electives.length}</p>
-                    <p className="text-xs text-slate-400">eletivas</p>
+                    <p className="text-2xl font-bold text-fg tabular-nums">{electives.length}</p>
+                    <p className="text-xs text-fg-subtle">eletivas</p>
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-brand-600 tabular-nums">{total}</p>
-                    <p className="text-xs text-slate-400">total</p>
+                    <p className="text-xs text-fg-subtle">total</p>
                   </div>
                 </div>
               </div>
@@ -110,8 +110,8 @@ export default async function MatrizesPage() {
                         <div className="w-6 h-6 rounded-lg bg-brand-100 flex items-center justify-center flex-shrink-0">
                           <span className="text-brand-700 text-xs font-bold">{num}</span>
                         </div>
-                        <p className="text-sm font-semibold text-slate-700">{num}º Semestre</p>
-                        <span className="text-xs text-slate-400">{items.length} disciplinas</span>
+                        <p className="text-sm font-semibold text-fg">{num}º Semestre</p>
+                        <span className="text-xs text-fg-subtle">{items.length} disciplinas</span>
                       </div>
                       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
                         {items.map((cs, i) => (
@@ -120,13 +120,13 @@ export default async function MatrizesPage() {
                             className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm ${
                               cs.subject?.modality === 'ead'
                                 ? 'bg-purple-50'
-                                : 'bg-slate-50'
+                                : 'bg-surface-2'
                             }`}
                           >
-                            <span className="font-mono text-xs text-slate-300 flex-shrink-0 w-14 truncate">
+                            <span className="font-mono text-xs text-edge flex-shrink-0 w-14 truncate">
                               {cs.subject?.code}
                             </span>
-                            <span className="text-slate-700 leading-tight truncate">
+                            <span className="text-fg leading-tight truncate">
                               {cs.subject?.name}
                             </span>
                           </div>
@@ -143,16 +143,16 @@ export default async function MatrizesPage() {
                       <div className="w-6 h-6 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
                         <span className="text-purple-700 text-xs font-bold">E</span>
                       </div>
-                      <p className="text-sm font-semibold text-slate-700">Eletivas EAD</p>
-                      <span className="text-xs text-slate-400">{electives.length} disponíveis</span>
+                      <p className="text-sm font-semibold text-fg">Eletivas EAD</p>
+                      <span className="text-xs text-fg-subtle">{electives.length} disponíveis</span>
                     </div>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2">
                       {electives.map((cs, i) => (
                         <div key={i} className="flex items-center gap-2 px-3 py-2 rounded-xl bg-purple-50 text-sm">
-                          <span className="font-mono text-xs text-slate-300 flex-shrink-0 w-14 truncate">
+                          <span className="font-mono text-xs text-edge flex-shrink-0 w-14 truncate">
                             {cs.subject?.code}
                           </span>
-                          <span className="text-slate-700 leading-tight truncate">
+                          <span className="text-fg leading-tight truncate">
                             {cs.subject?.name}
                           </span>
                         </div>

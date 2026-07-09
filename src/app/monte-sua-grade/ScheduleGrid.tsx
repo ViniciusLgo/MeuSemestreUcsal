@@ -1,6 +1,5 @@
 'use client'
 
-// Slots de horário por turno
 export const MORNING_SLOTS = [
   { id: 0, label: '07:00', range: '07:00–07:50' },
   { id: 1, label: '07:50', range: '07:50–08:40' },
@@ -20,16 +19,16 @@ export const DAYS = ['SEG', 'TER', 'QUA', 'QUI', 'SEX'] as const
 export type Day = typeof DAYS[number]
 
 export const SUBJECT_COLORS = [
-  { bg: 'bg-emerald-500', text: 'text-white', light: 'bg-emerald-100 text-emerald-800', hex: '#10b981' },
-  { bg: 'bg-blue-500',    text: 'text-white', light: 'bg-blue-100 text-blue-800',    hex: '#3b82f6' },
-  { bg: 'bg-purple-500',  text: 'text-white', light: 'bg-purple-100 text-purple-800',  hex: '#a855f7' },
-  { bg: 'bg-orange-500',  text: 'text-white', light: 'bg-orange-100 text-orange-800',  hex: '#f97316' },
-  { bg: 'bg-rose-500',    text: 'text-white', light: 'bg-rose-100 text-rose-800',    hex: '#f43f5e' },
-  { bg: 'bg-cyan-500',    text: 'text-white', light: 'bg-cyan-100 text-cyan-800',    hex: '#06b6d4' },
-  { bg: 'bg-amber-500',   text: 'text-white', light: 'bg-amber-100 text-amber-800',   hex: '#f59e0b' },
-  { bg: 'bg-indigo-500',  text: 'text-white', light: 'bg-indigo-100 text-indigo-800',  hex: '#6366f1' },
-  { bg: 'bg-teal-500',    text: 'text-white', light: 'bg-teal-100 text-teal-800',    hex: '#14b8a6' },
-  { bg: 'bg-pink-500',    text: 'text-white', light: 'bg-pink-100 text-pink-800',    hex: '#ec4899' },
+  { bg: 'bg-emerald-500', hex: '#10b981' },
+  { bg: 'bg-blue-500',    hex: '#3b82f6' },
+  { bg: 'bg-purple-500',  hex: '#a855f7' },
+  { bg: 'bg-orange-500',  hex: '#f97316' },
+  { bg: 'bg-rose-500',    hex: '#f43f5e' },
+  { bg: 'bg-cyan-500',    hex: '#06b6d4' },
+  { bg: 'bg-amber-500',   hex: '#f59e0b' },
+  { bg: 'bg-indigo-500',  hex: '#6366f1' },
+  { bg: 'bg-teal-500',    hex: '#14b8a6' },
+  { bg: 'bg-pink-500',    hex: '#ec4899' },
 ]
 
 export type ScheduleSlot = {
@@ -40,65 +39,60 @@ export type ScheduleSlot = {
   colorIdx: number
 }
 
-// Chave da célula: "DAY:SLOT"
 export type ScheduleMap = Record<string, ScheduleSlot | undefined>
 
 interface Props {
   scheduleMap: ScheduleMap
   shift: string | null
-  // Qual disciplina está "selecionada para colocar na grade"
-  activeSubject: ScheduleSlot | null
-  onCellClick: (key: string) => void
-  onCellRemove: (key: string) => void
+  onRemove: (key: string) => void
+  compact?: boolean
 }
 
-export function ScheduleGrid({ scheduleMap, shift, activeSubject, onCellClick, onCellRemove }: Props) {
+export function ScheduleGrid({ scheduleMap, shift, onRemove, compact = false }: Props) {
   const slots = shift?.toLowerCase() === 'noturno' ? NIGHT_SLOTS : MORNING_SLOTS
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-xs border-collapse">
+      <table className="w-full border-collapse text-xs">
         <thead>
           <tr>
-            <th className="w-20 py-2 text-fg-subtle font-medium text-right pr-3">Horário</th>
+            <th className={`text-fg-subtle font-medium text-right pr-2 ${compact ? 'w-14' : 'w-20'}`} />
             {DAYS.map((d) => (
-              <th key={d} className="py-2 text-center font-semibold text-fg-muted px-1">{d}</th>
+              <th key={d} className="text-center font-semibold text-fg-muted pb-1.5 px-0.5">
+                {compact ? d.slice(0, 1) : d}
+              </th>
             ))}
           </tr>
         </thead>
         <tbody>
           {slots.map((slot) => (
             <tr key={slot.id} className="border-t border-edge-muted">
-              <td className="py-0.5 pr-3 text-right text-fg-subtle whitespace-nowrap align-middle">
-                <span className="text-[10px]">{slot.range}</span>
+              <td className="pr-2 py-0.5 text-right text-fg-subtle align-middle whitespace-nowrap">
+                <span className="text-[10px]">{compact ? slot.label : slot.range}</span>
               </td>
               {DAYS.map((day) => {
                 const key = `${day}:${slot.id}`
                 const cell = scheduleMap[key]
-
                 return (
                   <td key={day} className="p-0.5 align-middle">
                     {cell ? (
-                      <div
-                        className={`${SUBJECT_COLORS[cell.colorIdx].bg} ${SUBJECT_COLORS[cell.colorIdx].text}
-                          rounded-lg px-1.5 py-1.5 text-center cursor-pointer hover:opacity-80 transition-opacity group relative`}
-                        onClick={() => onCellRemove(key)}
-                        title={`${cell.subject_name} — ${cell.teacher_name}\nClique para remover`}
+                      <button
+                        onClick={() => onRemove(key)}
+                        title={`${cell.subject_name}\n${cell.teacher_name}\nClique para remover`}
+                        className={`w-full ${SUBJECT_COLORS[cell.colorIdx].bg} text-white rounded-md
+                          px-1 py-1.5 text-center hover:opacity-70 transition-opacity`}
                       >
                         <p className="font-bold leading-none text-[10px]">{cell.subject_code}</p>
-                        <p className="leading-none mt-0.5 text-[9px] opacity-80 truncate max-w-[60px]">
-                          {cell.teacher_name.split(' ')[0]}
-                        </p>
-                      </div>
+                        {!compact && (
+                          <p className="leading-none mt-0.5 text-[9px] opacity-80 truncate">
+                            {cell.teacher_name.split(' ')[0]}
+                          </p>
+                        )}
+                      </button>
                     ) : (
-                      <div
-                        className={`rounded-lg h-9 transition-all cursor-pointer border border-transparent
-                          ${activeSubject
-                            ? `hover:border-[${SUBJECT_COLORS[activeSubject.colorIdx].hex}] hover:bg-surface-2 hover:opacity-80`
-                            : 'hover:bg-surface-2 opacity-30'
-                          }`}
-                        onClick={() => activeSubject && onCellClick(key)}
-                      />
+                      <div className={`rounded-md border border-transparent ${
+                        compact ? 'h-7' : 'h-9'
+                      } bg-surface-2 opacity-20`} />
                     )}
                   </td>
                 )
@@ -107,13 +101,6 @@ export function ScheduleGrid({ scheduleMap, shift, activeSubject, onCellClick, o
           ))}
         </tbody>
       </table>
-      {activeSubject && (
-        <p className="mt-2 text-xs text-center text-fg-subtle">
-          Clique nas células para posicionar{' '}
-          <span className="font-semibold text-fg">{activeSubject.subject_code}</span>
-          {' '}na grade
-        </p>
-      )}
     </div>
   )
 }

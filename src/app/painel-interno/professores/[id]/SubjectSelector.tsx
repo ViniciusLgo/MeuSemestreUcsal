@@ -66,11 +66,11 @@ export function SubjectSelector({ teacherId, subjects, action, courses }: Props)
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
           placeholder="Filtrar disciplinas..."
-          className="flex-1 min-w-48 px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="flex-1 min-w-48 px-4 py-2.5 border border-edge rounded-xl text-sm text-fg placeholder:text-fg-subtle focus:outline-none focus:ring-2 focus:ring-brand-500"
         />
         <select
           name="course_id"
-          className="px-4 py-2.5 border border-slate-200 rounded-xl text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500"
+          className="px-4 py-2.5 border border-edge rounded-xl text-sm text-fg focus:outline-none focus:ring-2 focus:ring-brand-500"
         >
           <option value="">Todos os cursos</option>
           {courses.map((c) => (
@@ -87,7 +87,7 @@ export function SubjectSelector({ teacherId, subjects, action, courses }: Props)
       </div>
 
       {filtered.length === 0 && (
-        <p className="text-sm text-slate-400 py-4">Nenhuma disciplina encontrada.</p>
+        <p className="text-sm text-fg-subtle py-4">Nenhuma disciplina encontrada.</p>
       )}
 
       <div className="space-y-5">
@@ -106,15 +106,15 @@ export function SubjectSelector({ teacherId, subjects, action, courses }: Props)
                   onChange={(e) => toggleAll(allIds, e.target.checked)}
                   className="w-4 h-4 accent-brand-600"
                 />
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                <p className="text-xs font-semibold text-fg-muted uppercase tracking-wide">
                   {TYPE_LABEL[type] ?? type} ({list.length})
                 </p>
               </div>
-              <div className="bg-white rounded-xl border border-slate-200 divide-y divide-slate-100">
+              <div className="bg-surface rounded-xl border border-edge divide-y divide-edge-muted">
                 {list.map((s) => (
                   <label
                     key={s.id}
-                    className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-slate-50 transition-colors"
+                    className="flex items-center gap-3 px-4 py-3 cursor-pointer hover:bg-surface-2 transition-colors"
                   >
                     <input
                       type="checkbox"
@@ -128,8 +128,8 @@ export function SubjectSelector({ teacherId, subjects, action, courses }: Props)
                       }}
                       className="w-4 h-4 accent-brand-600 flex-shrink-0"
                     />
-                    <span className="text-sm text-slate-900">
-                      <span className="font-mono text-xs text-slate-400 mr-2">{s.code}</span>
+                    <span className="text-sm text-fg">
+                      <span className="font-mono text-xs text-fg-subtle mr-2">{s.code}</span>
                       {s.name}
                     </span>
                   </label>

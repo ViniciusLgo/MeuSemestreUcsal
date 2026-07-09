@@ -18,13 +18,18 @@ export async function getTeachersBySubject(subjectId: string): Promise<TeacherBa
   const supabase = await createClient()
   const { data } = await supabase
     .from('teacher_subjects')
-    .select('teacher:teachers(id, name, slug)')
+    .select('teacher:teachers!inner(id, name, slug)')
     .eq('subject_id', subjectId)
-    .eq('active', true)
+    .eq('teachers.active', true)
   if (!data) return []
-  return (data as Array<{ teacher: TeacherBasic | null }>)
-    .map((ts) => ts.teacher)
-    .filter((t): t is TeacherBasic => t !== null)
+  const seen = new Set<string>()
+  const result: TeacherBasic[] = []
+  for (const row of data as Array<{ teacher: TeacherBasic | null }>) {
+    if (!row.teacher || seen.has(row.teacher.id)) continue
+    seen.add(row.teacher.id)
+    result.push(row.teacher)
+  }
+  return result
 }
 
 export type ReviewPublic = {

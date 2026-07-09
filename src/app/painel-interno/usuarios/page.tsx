@@ -14,17 +14,17 @@ export default async function UsuariosPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-900 mb-8">Usuários</h1>
+      <h1 className="text-2xl font-bold text-fg mb-8">Usuários</h1>
 
-      <div className="bg-white rounded-2xl border border-slate-200 divide-y divide-slate-100">
+      <div className="bg-surface rounded-2xl border border-edge divide-y divide-edge-muted">
         {(users ?? []).length === 0 && (
-          <p className="px-6 py-8 text-center text-slate-400 text-sm">Nenhum usuário ainda.</p>
+          <p className="px-6 py-8 text-center text-fg-subtle text-sm">Nenhum usuário ainda.</p>
         )}
         {(users ?? []).map((u: any) => (
           <div key={u.id} className="flex items-center justify-between px-6 py-4">
             <div>
               <div className="flex items-center gap-2">
-                <p className="text-sm font-medium text-slate-900">{u.email}</p>
+                <p className="text-sm font-medium text-fg">{u.email}</p>
                 {u.role === 'admin' && (
                   <span className="text-xs bg-brand-50 text-brand-700 font-semibold px-2 py-0.5 rounded-full">admin</span>
                 )}
@@ -32,7 +32,7 @@ export default async function UsuariosPage() {
                   <span className="text-xs bg-red-50 text-red-600 font-semibold px-2 py-0.5 rounded-full">banido</span>
                 )}
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-fg-subtle mt-0.5">
                 {u.course?.code ?? 'sem curso'} · {new Date(u.created_at).toLocaleDateString('pt-BR')}
               </p>
             </div>
