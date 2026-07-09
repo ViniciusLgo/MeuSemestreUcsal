@@ -28,9 +28,17 @@ export default async function ProfessorDetailPage({ params }: Props) {
   if (!teacherRes.data) notFound()
 
   const teacher = teacherRes.data
-  const links: any[] = linksRes.data ?? []
+  const rawLinks: any[] = linksRes.data ?? []
   const allSubjects: any[] = subjectsRes.data ?? []
   const courses: any[] = coursesRes.data ?? []
+
+  // Deduplicar vínculos por subject_id (pode haver duplicatas no banco)
+  const seenSubjectIds = new Set<string>()
+  const links = rawLinks.filter((l: any) => {
+    if (!l.subject?.id || seenSubjectIds.has(l.subject.id)) return false
+    seenSubjectIds.add(l.subject.id)
+    return true
+  })
 
   const linkedSubjectIds = new Set(links.map((l: any) => l.subject?.id))
   const availableSubjects = allSubjects.filter((s: any) => !linkedSubjectIds.has(s.id))

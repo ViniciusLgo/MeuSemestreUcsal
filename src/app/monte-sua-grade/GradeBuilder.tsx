@@ -78,26 +78,33 @@ function scoreStyle(n: number) {
 
 async function fetchSlotsForSemester(
   supabase: ReturnType<typeof createClient>,
-  cvId: string,
+  cvIds: string[],
   semNumber: number
 ): Promise<SubjectSlot[]> {
-  const { data: semRow } = await (supabase as any)
+  if (!cvIds.length) return []
+
+  const { data: semRows } = await (supabase as any)
     .from('semesters')
     .select('id')
-    .eq('curriculum_version_id', cvId)
+    .in('curriculum_version_id', cvIds)
     .eq('number', semNumber)
-    .single()
-  if (!semRow) return []
+  const semIds = (semRows ?? []).map((r: any) => r.id)
+  if (!semIds.length) return []
 
   const { data: csRows } = await (supabase as any)
     .from('curriculum_subjects')
     .select('subject:subjects(id, code, name, type)')
-    .eq('curriculum_version_id', cvId)
-    .eq('semester_id', semRow.id)
+    .in('semester_id', semIds)
 
+  // Deduplicar por subject_id (aparece em múltiplas versões do mesmo curso)
+  const seenSubjectIds = new Set<string>()
   const subjects = (csRows ?? [])
     .map((r: any) => r.subject)
-    .filter((s: any) => s?.type === 'mandatory') as Array<{ id: string; code: string; name: string }>
+    .filter((s: any) => {
+      if (!s || s.type !== 'mandatory' || seenSubjectIds.has(s.id)) return false
+      seenSubjectIds.add(s.id)
+      return true
+    }) as Array<{ id: string; code: string; name: string }>
 
   if (!subjects.length) return []
   const subjectIds = subjects.map((s) => s.id)
@@ -151,7 +158,6 @@ async function fetchSlotsForSemester(
 export function GradeBuilder() {
   const [course, setCourse] = useState('BES')
   const [versions, setVersions] = useState<CurriculumVersion[]>([])
-  const [selectedVersionId, setSelectedVersionId] = useState<string | null>(null)
   const [activeSemesters, setActiveSemesters] = useState<number[]>([1])
   const [slots, setSlots] = useState<SubjectSlot[]>([])
   const [selections, setSelections] = useState<Selections>({})
@@ -166,10 +172,7 @@ export function GradeBuilder() {
   // Cache de exibição independente do fetch — evita grade sumir ao trocar semestres
   const [displayCache, setDisplayCache] = useState<Record<string, { subject_name: string; subject_code: string; teacher_name: string; colorIdx: number }>>({})
 
-
   const maxSemesters = COURSES.find((c) => c.code === course)?.semesters ?? 8
-  const selectedVersion = versions.find((v) => v.id === selectedVersionId)
-  const shift = selectedVersion?.shift ?? null
 
   useEffect(() => {
     async function load() {
@@ -180,9 +183,7 @@ export function GradeBuilder() {
       const { data } = await (supabase as any)
         .from('curriculum_versions').select('id, name, shift')
         .eq('course_id', courseRow.id).eq('active', true)
-      const vList: CurriculumVersion[] = data ?? []
-      setVersions(vList)
-      setSelectedVersionId(vList[0]?.id ?? null)
+      setVersions(data ?? [])
     }
     load()
     setActiveSemesters([1])
@@ -195,10 +196,11 @@ export function GradeBuilder() {
   }, [course])
 
   useEffect(() => {
-    if (!selectedVersionId || !activeSemesters.length) return
+    if (!versions.length || !activeSemesters.length) return
+    const cvIds = versions.map((v) => v.id)
     setLoading(true)
     const supabase = createClient()
-    Promise.all(activeSemesters.map((n) => fetchSlotsForSemester(supabase, selectedVersionId, n)))
+    Promise.all(activeSemesters.map((n) => fetchSlotsForSemester(supabase, cvIds, n)))
       .then((results) => {
         const merged = results.flat()
         setSlots(merged)
@@ -212,7 +214,33 @@ export function GradeBuilder() {
         })
       })
       .finally(() => setLoading(false))
-  }, [selectedVersionId, activeSemesters])
+  }, [versions, activeSemesters])
+
+  // Backfill displayCache para professores já selecionados após (re)carregamento de slots
+  useEffect(() => {
+    if (!slots.length) return
+    setDisplayCache((prev) => {
+      const next = { ...prev }
+      let changed = false
+      for (const s of slots) {
+        const tid = selections[s.subject_id]
+        if (tid && !next[s.subject_id]) {
+          const teacher = s.teachers.find((t) => t.teacher_id === tid)
+          if (teacher) {
+            next[s.subject_id] = {
+              subject_name: s.subject_name,
+              subject_code: s.subject_code,
+              teacher_name: teacher.teacher_name,
+              colorIdx: colorMap[s.subject_id] ?? 0,
+            }
+            changed = true
+          }
+        }
+      }
+      return changed ? next : prev
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slots])
 
   // Constrói o ScheduleMap usando displayCache (não depende de slots — grade não some ao trocar semestre)
   const scheduleMap: ScheduleMap = {}
@@ -322,7 +350,7 @@ export function GradeBuilder() {
       <div className="hidden print:block p-6">
         <h1 className="text-xl font-bold mb-1">Minha Grade — {course}</h1>
         <p className="text-sm text-fg-muted mb-4">
-          {shift ?? ''}{shift ? ' · ' : ''}{activeSemesters.map((n) => `${n}º`).join(', ')} Semestre
+          {activeSemesters.map((n) => `${n}º`).join(', ')} Semestre
         </p>
         <ScheduleGrid scheduleMap={scheduleMap} onRemove={() => {}} compact />
         <p className="text-[10px] text-fg-subtle text-right mt-4">
@@ -370,21 +398,6 @@ export function GradeBuilder() {
                   ))}
                 </div>
               </div>
-
-              {versions.length > 1 && (
-                <div>
-                  <p className="text-[11px] font-semibold text-fg-subtle uppercase tracking-wider mb-2">Turno</p>
-                  <div className="flex gap-2">
-                    {versions.map((v) => (
-                      <button key={v.id} onClick={() => setSelectedVersionId(v.id)}
-                        className={`px-4 py-2 rounded-xl border text-sm font-semibold transition-all ${
-                          selectedVersionId === v.id ? 'bg-accent-500 border-accent-500 text-white'
-                            : 'bg-canvas border-edge text-fg-muted hover:border-accent-400 hover:text-accent-400'
-                        }`}>{v.shift ?? v.name}</button>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               <div>
                 <p className="text-[11px] font-semibold text-fg-subtle uppercase tracking-wider mb-2">
@@ -640,7 +653,7 @@ export function GradeBuilder() {
               <div className="flex items-center justify-between mb-3">
                 <h2 className="text-sm font-semibold text-fg">Grade semanal</h2>
                 <span className="text-xs text-fg-subtle">
-                  {shift ?? 'Todos os turnos'}
+                  Manhã + Noite
                 </span>
               </div>
               <ScheduleGrid

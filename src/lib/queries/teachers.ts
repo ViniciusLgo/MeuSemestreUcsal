@@ -47,9 +47,29 @@ export type ReviewByTeacher = {
   would_recommend: boolean
   attendance_pressure: 'baixa' | 'media' | 'alta' | null
   assessment_style: 'prova' | 'projeto' | 'trabalho' | 'misto' | null
+  teacher_absence: 'nunca' | 'raramente' | 'frequente' | null
+  is_easy_to_pass: boolean | null
+  teacher_is_engaging: boolean | null
+  exam_types: string[] | null
+  has_assignments: boolean | null
+  has_activities: boolean | null
   comment: string | null
   created_at: string
   subject: { id: string; name: string; code: string } | null
+}
+
+// Stats por disciplina para o professor
+export type SubjectStats = {
+  subject_id: string
+  subject_name: string
+  subject_code: string
+  review_count: number
+  avg_general: number
+  avg_didactics: number
+  avg_organization: number
+  avg_workload: number
+  avg_difficulty: number
+  would_recommend_pct: number
 }
 
 export async function getReviewsByTeacher(teacherId: string): Promise<ReviewByTeacher[]> {
@@ -60,10 +80,35 @@ export async function getReviewsByTeacher(teacherId: string): Promise<ReviewByTe
       id, rating_general, rating_didactics, rating_organization,
       rating_workload, rating_difficulty, would_recommend,
       attendance_pressure, assessment_style, comment, created_at,
+      teacher_absence, is_easy_to_pass, teacher_is_engaging,
+      exam_types, has_assignments, has_activities,
       subject:subjects(id, name, code)
     `)
     .eq('teacher_id', teacherId)
     .eq('status', 'publicada')
     .order('created_at', { ascending: false })
   return (data ?? []) as ReviewByTeacher[]
+}
+
+export function buildSubjectStats(reviews: ReviewByTeacher[]): SubjectStats[] {
+  const map = new Map<string, { name: string; code: string; reviews: ReviewByTeacher[] }>()
+  for (const r of reviews) {
+    if (!r.subject) continue
+    const entry = map.get(r.subject.id) ?? { name: r.subject.name, code: r.subject.code, reviews: [] }
+    entry.reviews.push(r)
+    map.set(r.subject.id, entry)
+  }
+  return Array.from(map.entries()).map(([subject_id, { name, code, reviews: rs }]) => {
+    const n = rs.length
+    const avg = (key: keyof ReviewByTeacher) => rs.reduce((s, r) => s + Number(r[key] ?? 0), 0) / n
+    return {
+      subject_id, subject_name: name, subject_code: code, review_count: n,
+      avg_general: avg('rating_general'),
+      avg_didactics: avg('rating_didactics'),
+      avg_organization: avg('rating_organization'),
+      avg_workload: avg('rating_workload'),
+      avg_difficulty: avg('rating_difficulty'),
+      would_recommend_pct: Math.round(rs.filter((r) => r.would_recommend).length / n * 100),
+    }
+  }).sort((a, b) => b.avg_general - a.avg_general)
 }

@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import { SignOutButton } from '@/components/layout/SignOutButton'
 import { StarRating } from '@/components/ui/StarRating'
 import { deleteOwnReview } from '@/lib/actions/student'
+import { deleteSavedGrade } from '@/lib/actions/grade'
 
 export const metadata: Metadata = { title: 'Meu Perfil — MeuSemestreUCSAL' }
 
@@ -20,6 +21,16 @@ type OwnReview = {
   subject: { id: string; name: string; code: string } | null
 }
 
+type SavedGrade = {
+  id: string
+  name: string
+  course_code: string
+  semesters: number[]
+  items: Array<{ subject_name: string; teacher_name: string; days: string[]; slotId: number }>
+  created_at: string
+  updated_at: string
+}
+
 const diffLabel: Record<number, string> = { 2: 'Fácil', 3: 'Médio', 4: 'Difícil', 5: 'HARDCORE' }
 const styleLabel: Record<string, string> = {
   prova: 'Prova', projeto: 'Projeto', trabalho: 'Trabalho', misto: 'Misto',
@@ -31,7 +42,7 @@ export default async function PerfilPage() {
 
   const supabase = await createClient()
 
-  const [courseRes, reviewsRes] = await Promise.all([
+  const [courseRes, reviewsRes, gradesRes] = await Promise.all([
     profile.course_id
       ? (supabase as any).from('courses').select('code, name').eq('id', profile.course_id).single()
       : Promise.resolve({ data: null }),
@@ -40,10 +51,16 @@ export default async function PerfilPage() {
       .select('id, rating_general, assessment_style, comment, created_at, status, teacher:teachers(id, name), subject:subjects(id, name, code)')
       .eq('author_id', profile.id)
       .order('created_at', { ascending: false }),
+    (supabase as any)
+      .from('saved_grades')
+      .select('id, name, course_code, semesters, items, created_at, updated_at')
+      .eq('user_id', profile.id)
+      .order('updated_at', { ascending: false }),
   ])
 
   const courseCode = courseRes.data as { code: string; name: string } | null
   const reviews: OwnReview[] = reviewsRes.data ?? []
+  const savedGrades: SavedGrade[] = gradesRes.data ?? []
 
   return (
     <div className="container-page py-12 max-w-2xl mx-auto">
@@ -92,6 +109,89 @@ export default async function PerfilPage() {
 
       <div className="flex justify-end mb-8">
         <SignOutButton className="text-sm font-medium text-red-400 border border-edge px-4 py-2 rounded-xl hover:bg-[#2d0a0a] hover:border-red-700 transition-colors bg-surface" />
+      </div>
+
+      {/* ── Grades salvas ───────────────────────────────────────────── */}
+      <div className="mb-10">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-fg">
+            Grades salvas
+            {savedGrades.length > 0 && (
+              <span className="ml-2 text-sm font-normal text-fg-subtle">({savedGrades.length})</span>
+            )}
+          </h2>
+          <Link href="/monte-sua-grade"
+            className="text-sm font-semibold bg-accent-500 text-white px-4 py-2 rounded-xl hover:bg-accent-600 transition-colors">
+            + Montar grade
+          </Link>
+        </div>
+
+        {savedGrades.length === 0 ? (
+          <div className="bg-surface border border-edge rounded-2xl px-6 py-10 text-center">
+            <div className="text-4xl mb-3">📅</div>
+            <p className="text-fg-muted font-medium mb-1">Nenhuma grade salva ainda.</p>
+            <p className="text-fg-subtle text-sm mb-5">Monte sua grade e salve para acessar aqui.</p>
+            <Link href="/monte-sua-grade"
+              className="inline-flex items-center gap-2 bg-accent-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl hover:bg-accent-600 transition-colors">
+              Montar minha grade →
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {savedGrades.map((grade) => (
+              <div key={grade.id} className="bg-surface border border-edge rounded-2xl overflow-hidden">
+                <div className="px-5 py-4 flex items-start justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm font-bold text-fg">{grade.name}</p>
+                      <span className="text-xs font-mono text-fg-subtle bg-surface-2 px-1.5 py-0.5 rounded">{grade.course_code}</span>
+                    </div>
+                    <p className="text-xs text-fg-subtle mb-2">
+                      {grade.semesters.length === 1
+                        ? `${grade.semesters[0]}º semestre`
+                        : `Semestres: ${grade.semesters.sort((a, b) => a - b).join(', ')}`}
+                      {' · '}
+                      {grade.items.length} {grade.items.length === 1 ? 'disciplina' : 'disciplinas'}
+                    </p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {grade.items.slice(0, 4).map((item, i) => (
+                        <span key={i} className="text-[11px] bg-surface-2 border border-edge-muted px-2 py-0.5 rounded-full text-fg-muted">
+                          {item.subject_name}
+                        </span>
+                      ))}
+                      {grade.items.length > 4 && (
+                        <span className="text-[11px] text-fg-subtle px-1">+{grade.items.length - 4}</span>
+                      )}
+                    </div>
+                    <p className="text-xs text-fg-subtle mt-2">
+                      Salva em {new Date(grade.updated_at).toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col items-end gap-2 flex-shrink-0">
+                    <Link href={`/monte-sua-grade?grade=${grade.id}`}
+                      className="text-xs font-semibold text-brand-400 border border-brand-300 bg-brand-100 px-3 py-1.5 rounded-lg hover:bg-brand-200 transition-colors whitespace-nowrap">
+                      Carregar
+                    </Link>
+                    <form action={async () => {
+                      'use server'
+                      await deleteSavedGrade(grade.id)
+                    }}>
+                      <button type="submit"
+                        title="Excluir grade"
+                        className="w-7 h-7 flex items-center justify-center rounded-lg border border-edge text-fg-subtle hover:border-red-500 hover:text-red-400 hover:bg-[#2d0a0a] transition-all">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ── Minhas avaliações ────────────────────────────────────────── */}
