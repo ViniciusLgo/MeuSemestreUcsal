@@ -36,12 +36,13 @@ export async function notifyReviewPublished(data: {
   ratingGeneral: number
   comment?: string | null
 }) {
-  const stars = '★'.repeat(data.ratingGeneral) + '☆'.repeat(5 - data.ratingGeneral)
+  const filled = Math.round(data.ratingGeneral / 2)
+  const stars = '★'.repeat(filled) + '☆'.repeat(5 - filled)
   const text = [
     `✅ <b>Nova avaliação publicada</b>`,
     `👤 ${esc(data.teacherName)}`,
     `📚 ${esc(data.subjectCode)} — ${esc(data.subjectName)}`,
-    `${stars} <b>${data.ratingGeneral}/5</b>`,
+    `${stars} <b>${data.ratingGeneral}/10</b>`,
     data.comment ? `💬 <i>"${esc(data.comment.slice(0, 200))}${data.comment.length > 200 ? '…' : ''}"</i>` : null,
   ].filter(Boolean).join('\n')
 
@@ -60,7 +61,7 @@ export async function notifyReviewInReview(data: {
     `⚠️ <b>Avaliação em revisão</b>`,
     `👤 ${esc(data.teacherName)}`,
     `📚 ${esc(data.subjectCode)} — ${esc(data.subjectName)}`,
-    `⭐ ${data.ratingGeneral}/5`,
+    `⭐ ${data.ratingGeneral}/10`,
     data.comment ? `💬 <i>"${esc(data.comment.slice(0, 200))}${data.comment.length > 200 ? '…' : ''}"</i>` : null,
     ``,
     `👉 <a href="${data.adminUrl ?? 'https://localhost:3000/painel-interno/avaliacoes?status=em_revisao'}">Revisar no painel</a>`,
