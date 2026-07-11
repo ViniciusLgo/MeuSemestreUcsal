@@ -7,6 +7,7 @@ import {
   type ReviewPublic,
   type TeacherWithRatings,
 } from '@/lib/queries/subjects'
+import { createClient } from '@/lib/supabase/server'
 import { Badge } from '@/components/ui/Badge'
 import { Card } from '@/components/ui/Card'
 import { StarRating } from '@/components/ui/StarRating'
@@ -64,11 +65,24 @@ function ratingColor(n: number, max = 5) {
 
 export default async function SubjectPage({ params }: Props) {
   const { id } = await params
-  const [subject, teachers, reviews] = await Promise.all([
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const [subject, teachers, reviews, threadsResult] = await Promise.all([
     getSubjectById(id),
     getTeachersBySubject(id),
     getReviewsBySubject(id),
+    (supabase as any)
+      .from('forum_threads')
+      .select('id, title, created_at, views')
+      .eq('subject_id', id)
+      .eq('status', 'publicado')
+      .order('created_at', { ascending: false })
+      .limit(5),
   ])
+
+  const subjectThreads: { id: string; title: string; created_at: string; views: number }[] =
+    threadsResult.data ?? []
   if (!subject) notFound()
 
   const isEad = subject.modality === 'ead'
@@ -170,6 +184,58 @@ export default async function SubjectPage({ params }: Props) {
       {/* ── Sugerir professor ────────────────────────────────────────── */}
       <div className="mb-10">
         <SuggestTeacherButton subjectId={subject.id} subjectName={subject.name} />
+      </div>
+
+      {/* ── Discussões do Fórum ──────────────────────────────────────── */}
+      <div className="mb-10">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-bold text-fg">
+            Discussões
+            {subjectThreads.length > 0 && (
+              <span className="ml-2 text-base font-normal text-fg-subtle">({subjectThreads.length})</span>
+            )}
+          </h2>
+          {user ? (
+            <Link
+              href={`/forum/nova?subject_id=${subject.id}`}
+              className="text-sm font-semibold bg-brand-600 text-white px-4 py-2 rounded-xl hover:bg-brand-700 transition-colors"
+            >
+              + Nova discussão
+            </Link>
+          ) : (
+            <Link
+              href={`/entrar?redirectTo=/forum/nova?subject_id=${subject.id}`}
+              className="text-sm font-medium text-fg-muted hover:text-brand-400 transition-colors"
+            >
+              Entre para participar →
+            </Link>
+          )}
+        </div>
+
+        {subjectThreads.length === 0 ? (
+          <Card className="text-center py-10">
+            <p className="text-fg-muted font-medium mb-1">Nenhuma discussão ainda.</p>
+            <p className="text-fg-subtle text-sm">Tem dúvidas ou experiências sobre esta disciplina? Compartilhe no fórum.</p>
+          </Card>
+        ) : (
+          <div className="bg-surface border border-edge rounded-2xl divide-y divide-edge-muted">
+            {subjectThreads.map((t) => (
+              <Link
+                key={t.id}
+                href={user ? `/forum/thread/${t.id}` : `/entrar?redirectTo=/forum/thread/${t.id}`}
+                className="flex items-center justify-between gap-4 px-5 py-3.5 hover:bg-surface-2 transition-colors group"
+              >
+                <p className="text-sm font-medium text-fg group-hover:text-brand-400 transition-colors line-clamp-1">
+                  {t.title}
+                </p>
+                <div className="flex items-center gap-3 flex-shrink-0 text-xs text-fg-subtle">
+                  <span>{t.views ?? 0} views</span>
+                  <span>{new Date(t.created_at).toLocaleDateString('pt-BR', { day: 'numeric', month: 'short' })}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* ── Avaliações ───────────────────────────────────────────────── */}
