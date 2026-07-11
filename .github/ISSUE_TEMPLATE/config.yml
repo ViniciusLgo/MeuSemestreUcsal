@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Dúvidas sobre a plataforma
+    url: https://github.com/ViniciusLgo/MeuSemestreUcsal/discussions
+    about: Para dúvidas gerais, use as Discussões do repositório.
