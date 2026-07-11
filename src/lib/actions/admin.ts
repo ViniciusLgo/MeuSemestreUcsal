@@ -169,6 +169,40 @@ export async function createTeacherForSubject(formData: FormData): Promise<void>
   revalidatePath('/painel-interno')
 }
 
+// ── Moderação do Fórum ───────────────────────────────────────
+
+export async function setForumThreadStatus(
+  thread_id: string,
+  status: 'publicado' | 'em_revisao' | 'oculto'
+) {
+  const supabase = await requireAdmin()
+  await (supabase as any).from('forum_threads').update({ status }).eq('id', thread_id)
+  revalidatePath('/painel-interno/forum')
+  revalidatePath('/forum')
+}
+
+export async function setForumPostStatus(
+  post_id: string,
+  status: 'publicado' | 'em_revisao' | 'oculto'
+) {
+  const supabase = await requireAdmin()
+  await (supabase as any).from('forum_posts').update({ status }).eq('id', post_id)
+  revalidatePath('/painel-interno/forum')
+}
+
+export async function deleteForumThread(thread_id: string) {
+  const supabase = await requireAdmin()
+  await (supabase as any).from('forum_threads').delete().eq('id', thread_id)
+  revalidatePath('/painel-interno/forum')
+  revalidatePath('/forum')
+}
+
+export async function deleteForumPost(post_id: string) {
+  const supabase = await requireAdmin()
+  await (supabase as any).from('forum_posts').delete().eq('id', post_id)
+  revalidatePath('/painel-interno/forum')
+}
+
 // ── Sugestões de professores ──────────────────────────────────
 
 export async function resolveTeacherSuggestion(formData: FormData): Promise<void> {

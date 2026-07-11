@@ -9,6 +9,7 @@ const NAV = [
   { href: '/painel-interno/sugestoes', label: 'Sugestões 💡' },
   { href: '/painel-interno/matrizes', label: 'Matrizes' },
   { href: '/painel-interno/avaliacoes', label: 'Avaliações' },
+  { href: '/painel-interno/forum', label: 'Fórum' },
   { href: '/painel-interno/usuarios', label: 'Usuários' },
   { href: '/painel-interno/configuracoes', label: 'Configurações' },
 ]
