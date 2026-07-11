@@ -11,6 +11,34 @@ type Entry = {
 
 const CHANGELOG: Entry[] = [
   {
+    version: '1.5',
+    date: '11/07/2026',
+    badge: 'melhoria',
+    items: [
+      'Fórum: upload de imagens (JPG, PNG, WebP até 5 MB) e PDFs (até 10 MB) nos tópicos',
+      'Fórum: seção "Discussões" na página de cada disciplina — veja e crie tópicos vinculados',
+      'Fórum: aba de moderação no painel admin com filtros por status e ações de publicar/ocultar/deletar',
+      'Fórum: email de código OTP reformulado com visual alinhado ao tema da plataforma',
+      'Infraestrutura: ambiente de desenvolvimento local com Supabase CLI + Docker documentado',
+      'Infraestrutura: suite de testes automatizados (RLS, nicknames, moderação) com Vitest',
+      'Documentação: guia de contribuição (CONTRIBUTING.md) para colaboradores externos',
+    ],
+  },
+  {
+    version: '1.4',
+    date: '10/07/2026',
+    badge: 'novo',
+    items: [
+      'Fórum anônimo de discussões — crie tópicos, responda e vote em enquetes sem revelar sua identidade',
+      'Nicknames por tópico: você recebe um apelido aleatório único em cada thread (ex: "Tucano Veloz")',
+      'Categorias de discussão: Geral, Dúvidas Acadêmicas, Estágio e Mercado, Desabafos, Projetos e Grupos',
+      'Enquetes opcionais nos tópicos com prazo, percentuais e bloqueio de voto duplo',
+      'Filtro de moderação automático em PT e EN — conteúdo suspeito vai para revisão, não é bloqueado',
+      'Rate limit: máx 5 tópicos e 20 respostas por dia por usuário',
+      'Fórum visível a todos, mas criação e leitura de discussões exige login com @ucsal.edu.br',
+    ],
+  },
+  {
     version: '1.3',
     date: '09/07/2026',
     badge: 'novo',
