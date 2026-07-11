@@ -1,0 +1,210 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { createThread } from '@/lib/actions/forum'
+import { Button } from '@/components/ui/Button'
+
+interface Category {
+  id:   string
+  name: string
+  icon: string
+  slug: string
+}
+
+interface Props {
+  categories: Category[]
+  subjectId?:  string | null
+  teacherId?:  string | null
+}
+
+export function ForumCreateForm({ categories, subjectId, teacherId }: Props) {
+  const router = useRouter()
+
+  const [categoryId, setCategoryId] = useState<string>(categories[0]?.id ?? '')
+  const [title,      setTitle]      = useState('')
+  const [body,       setBody]       = useState('')
+  const [hasPoll,    setHasPoll]    = useState(false)
+  const [pollQ,      setPollQ]      = useState('')
+  const [pollEnds,   setPollEnds]   = useState('')
+  const [options,    setOptions]    = useState(['', ''])
+  const [loading,    setLoading]    = useState(false)
+  const [error,      setError]      = useState<string | null>(null)
+
+  function addOption() {
+    if (options.length < 5) setOptions((v) => [...v, ''])
+  }
+
+  function setOption(i: number, val: string) {
+    setOptions((v) => v.map((o, idx) => idx === i ? val : o))
+  }
+
+  function removeOption(i: number) {
+    if (options.length <= 2) return
+    setOptions((v) => v.filter((_, idx) => idx !== i))
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setError(null)
+
+    if (!title.trim()) { setError('Título é obrigatório.'); return }
+    if (!body.trim())  { setError('Conteúdo é obrigatório.'); return }
+
+    const poll = hasPoll && pollQ.trim() && options.filter(Boolean).length >= 2
+      ? { question: pollQ.trim(), ends_at: pollEnds || null, options: options.filter(Boolean) }
+      : null
+
+    setLoading(true)
+    const result = await createThread({
+      category_id: subjectId ? null : (categoryId || null),
+      subject_id:  subjectId ?? null,
+      teacher_id:  teacherId ?? null,
+      title,
+      body,
+      poll,
+    })
+    setLoading(false)
+
+    if (result.error) { setError(result.error); return }
+    router.push(`/forum/thread/${result.thread_id}`)
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5">
+
+      {/* Categoria (só se não vinculado a disciplina) */}
+      {!subjectId && (
+        <div className="space-y-1.5">
+          <label className="text-sm font-semibold text-fg">Categoria</label>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setCategoryId(cat.id)}
+                className={`text-sm px-3 py-1.5 rounded-lg border transition-colors ${
+                  categoryId === cat.id
+                    ? 'bg-brand-600 border-brand-400 text-white'
+                    : 'bg-surface-2 border-edge text-fg-muted hover:border-fg-muted'
+                }`}
+              >
+                {cat.icon} {cat.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Título */}
+      <div className="space-y-1.5">
+        <label className="text-sm font-semibold text-fg">Título</label>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Título do seu tópico…"
+          maxLength={200}
+          className="w-full text-sm bg-canvas border border-edge rounded-xl px-3 py-2.5 text-fg placeholder:text-fg-subtle focus:outline-none focus:ring-1 focus:ring-accent-400"
+        />
+        <p className="text-xs text-fg-subtle text-right">{title.length}/200</p>
+      </div>
+
+      {/* Conteúdo */}
+      <div className="space-y-1.5">
+        <label className="text-sm font-semibold text-fg">Conteúdo</label>
+        <textarea
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          placeholder="Escreva sua mensagem aqui…"
+          rows={6}
+          maxLength={5000}
+          className="w-full text-sm bg-canvas border border-edge rounded-xl px-3 py-2.5 text-fg placeholder:text-fg-subtle focus:outline-none focus:ring-1 focus:ring-accent-400 resize-none"
+        />
+        <p className={`text-xs text-right ${5000 - body.length < 200 ? 'text-amber-400' : 'text-fg-subtle'}`}>
+          {5000 - body.length} caracteres restantes
+        </p>
+      </div>
+
+      {/* Enquete (opcional) */}
+      <div className="bg-surface-2 border border-edge rounded-xl p-4 space-y-3">
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={hasPoll}
+            onChange={(e) => setHasPoll(e.target.checked)}
+            className="accent-brand-400"
+          />
+          <span className="text-sm font-semibold text-fg">Adicionar enquete</span>
+        </label>
+
+        {hasPoll && (
+          <div className="space-y-3 pt-1">
+            <input
+              type="text"
+              value={pollQ}
+              onChange={(e) => setPollQ(e.target.value)}
+              placeholder="Pergunta da enquete…"
+              className="w-full text-sm bg-canvas border border-edge rounded-lg px-3 py-2 text-fg placeholder:text-fg-subtle focus:outline-none focus:ring-1 focus:ring-accent-400"
+            />
+
+            <div className="space-y-2">
+              {options.map((opt, i) => (
+                <div key={i} className="flex gap-2">
+                  <input
+                    type="text"
+                    value={opt}
+                    onChange={(e) => setOption(i, e.target.value)}
+                    placeholder={`Opção ${i + 1}`}
+                    className="flex-1 text-sm bg-canvas border border-edge rounded-lg px-3 py-2 text-fg placeholder:text-fg-subtle focus:outline-none focus:ring-1 focus:ring-accent-400"
+                  />
+                  {options.length > 2 && (
+                    <button
+                      type="button"
+                      onClick={() => removeOption(i)}
+                      className="text-sm text-fg-subtle hover:text-red-400 px-2 transition-colors"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              ))}
+              {options.length < 5 && (
+                <button
+                  type="button"
+                  onClick={addOption}
+                  className="text-xs text-fg-subtle hover:text-fg-muted transition-colors"
+                >
+                  + Adicionar opção
+                </button>
+              )}
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs text-fg-muted">Data de encerramento (opcional)</label>
+              <input
+                type="date"
+                value={pollEnds}
+                onChange={(e) => setPollEnds(e.target.value)}
+                className="text-sm bg-canvas border border-edge rounded-lg px-3 py-2 text-fg focus:outline-none focus:ring-1 focus:ring-accent-400"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Aviso de anonimato */}
+      <p className="text-xs text-fg-subtle bg-surface-2 border border-edge rounded-xl px-3 py-2.5">
+        🔒 Seu nome e e-mail nunca serão exibidos. Você receberá um apelido aleatório neste tópico.
+      </p>
+
+      {error && (
+        <p className="text-sm text-red-400 bg-[#2d0a0a] border border-red-700 px-3 py-2 rounded-xl">{error}</p>
+      )}
+
+      <Button type="submit" disabled={loading} className="w-full">
+        {loading ? 'Publicando…' : 'Publicar tópico'}
+      </Button>
+    </form>
+  )
+}

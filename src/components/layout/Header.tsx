@@ -44,6 +44,12 @@ export async function Header() {
           >
             Buscar
           </Link>
+          <Link
+            href="/forum"
+            className="px-3 py-2 text-fg-muted hover:text-fg hover:bg-surface-2 rounded-lg transition-colors"
+          >
+            Fórum
+          </Link>
         </nav>
 
         <div className="flex items-center gap-2">
