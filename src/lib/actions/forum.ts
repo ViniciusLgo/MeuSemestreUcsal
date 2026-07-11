@@ -113,7 +113,7 @@ export async function createThread(payload: CreateThreadPayload): Promise<{ erro
     .select('id')
     .single()
 
-  if (error || !thread) return { error: 'Erro ao criar thread.' }
+  if (error || !thread) return { error: 'Erro ao criar thread. Tente novamente.' }
 
   const { id: threadId } = thread as { id: string }
 

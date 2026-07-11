@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seu código de acesso</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0d1117;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#0d1117;min-height:100vh;">
+    <tr>
+      <td align="center" style="padding:48px 16px;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;">
+
+          <!-- Logo / Header -->
+          <tr>
+            <td align="center" style="padding-bottom:32px;">
+              <table cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="background-color:#161b22;border:1px solid #30363d;border-radius:12px;padding:12px 20px;">
+                    <span style="font-size:18px;font-weight:700;color:#f0f6fc;letter-spacing:-0.3px;">
+                      MeuSemestre<span style="color:#3fb950;">UCSAL</span>
+                    </span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Card principal -->
+          <tr>
+            <td style="background-color:#161b22;border:1px solid #30363d;border-radius:16px;padding:40px 40px 32px;">
+
+              <!-- Título -->
+              <p style="margin:0 0 8px;font-size:22px;font-weight:700;color:#f0f6fc;text-align:center;">
+                Seu código de acesso
+              </p>
+              <p style="margin:0 0 32px;font-size:14px;color:#8b949e;text-align:center;line-height:1.5;">
+                Use o código abaixo para entrar na plataforma.<br/>Ele expira em <strong style="color:#c9d1d9;">1 hora</strong> e só pode ser usado uma vez.
+              </p>
+
+              <!-- Código OTP -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:32px;">
+                <tr>
+                  <td align="center">
+                    <div style="display:inline-block;background-color:#0d1117;border:1px solid #3fb950;border-radius:12px;padding:20px 40px;">
+                      <span style="font-size:40px;font-weight:700;letter-spacing:12px;color:#3fb950;font-family:'Courier New',Courier,monospace;">
+                        {{ .Token }}
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Divider -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:24px;">
+                <tr>
+                  <td style="border-top:1px solid #21262d;"></td>
+                </tr>
+              </table>
+
+              <!-- Aviso de segurança -->
+              <p style="margin:0;font-size:12px;color:#8b949e;text-align:center;line-height:1.6;">
+                Se você não solicitou esse código, pode ignorar este email com segurança.<br/>
+                Nenhuma ação é necessária.
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding-top:24px;">
+              <p style="margin:0;font-size:12px;color:#484f58;">
+                MeuSemestreUCSAL — Avaliações anônimas para estudantes da UCSAL
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

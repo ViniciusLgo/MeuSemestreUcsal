@@ -364,6 +364,8 @@ END $$;
 
 -- =====================
 -- ADMIN SEED
--- Executar APÓS o usuário fazer login pela primeira vez
--- UPDATE profiles SET role = 'admin' WHERE email = 'vinicruzlago@gmail.com';
+-- Roda no reset; se o perfil ainda não existir (usuário nunca logou) é no-op.
+-- Após o primeiro login, rodar: supabase db reset --local
 -- =====================
+UPDATE profiles SET role = 'admin', status = 'active'
+WHERE email = 'vinicruzlago@gmail.com';
