@@ -295,6 +295,33 @@ export async function reportForumContent(
   return {}
 }
 
+// ── Registrar anexos após upload no Storage ───────────────────────────────────
+
+type AttachmentRecord = {
+  storage_path: string
+  mime_type: string
+  size_bytes: number
+}
+
+export async function recordForumAttachments(
+  threadId: string,
+  attachments: AttachmentRecord[]
+): Promise<{ error?: string }> {
+  const { supabase, user } = await requireActiveUser()
+
+  const rows = attachments.map((a) => ({
+    thread_id:    threadId,
+    uploader_id:  user.id,
+    storage_path: a.storage_path,
+    mime_type:    a.mime_type,
+    size_bytes:   a.size_bytes,
+  }))
+
+  const { error } = await (supabase as any).from('forum_attachments').insert(rows)
+  if (error) return { error: 'Erro ao registrar anexo.' }
+  return {}
+}
+
 // ── Incrementar visualizações ─────────────────────────────────────────────────
 
 export async function incrementThreadViews(threadId: string): Promise<void> {
